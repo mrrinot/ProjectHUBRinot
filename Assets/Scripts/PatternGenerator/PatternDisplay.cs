@@ -3,16 +3,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
 
-[RequireComponent(typeof(RectTransform))]
 public class PatternDisplay : MonoBehaviour {
+
+    public GameObject tilePrefab;
 
     private PatternDescriptorData _currentPattern = null;
     private List<GameObject> _patternTileList;
-    public GameObject tilePrefab;
+    private Image _panelImage;
 
-    void Start()
+    void Awake()
     {
         _patternTileList = new List<GameObject>();
+        _panelImage = GetComponent<Image>();
     }
 
     public void LoadPattern(PatternDescriptorData data)

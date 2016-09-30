@@ -2,6 +2,7 @@
 using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Xml;
 using System.IO;
 using System.Text;
@@ -13,27 +14,78 @@ public class PatternListController : MonoBehaviour {
     private List<string> _descriptorsList = new List<string>();
     private List<GameObject> _prefabsList = new List<GameObject>();
     private PatternDescriptorData _selected = null;
+    private PatternInfosManager _infos;
+    private PatternDisplay _display;
+    private PatternForbiddenControler _forbidden;
 
     public GameObject display;
+    public GameObject forbidden;
     public GameObject infosPanel;
     public static string DESCRIPTOR_PATH = "Assets/Resources/PatternDescriptors/";
     public GameObject filePrefab;
 
     void Start()
     {
+        _infos = infosPanel.GetComponent<PatternInfosManager>();
+        _display = display.GetComponent<PatternDisplay>();
+        _forbidden = forbidden.GetComponent<PatternForbiddenControler>();
         _rectTransform = GetComponent<RectTransform>();
         LoadPatternDescriptors();
+        SelectPattern(_prefabsList[0]);
+    }
+
+    void updateOldName(string oldName, string newName)
+    {
+        foreach (string name in _descriptorsList)
+        {
+            PatternDescriptorData data = GetDataFromFile(name);
+            bool changed = false;
+            if (data.upFor.FirstOrDefault(x => x == oldName) != null)
+            {
+                data.upFor = data.upFor.Select<string, string>(s => s == oldName ? newName : s).ToList();
+                changed = true;
+            }
+            if (data.downFor.FirstOrDefault(x => x == oldName) != null)
+            {
+                data.downFor = data.downFor.Select<string, string>(s => s == oldName ? newName : s).ToList();
+                changed = true;
+            }
+            if (data.leftFor.FirstOrDefault(x => x == oldName) != null)
+            {
+                data.leftFor = data.leftFor.Select<string, string>(s => s == oldName ? newName : s).ToList();
+                changed = true;
+            }
+            if (data.rightFor.FirstOrDefault(x => x == oldName) != null)
+            {
+                data.rightFor = data.rightFor.Select<string, string>(s => s == oldName ? newName : s).ToList();
+                changed = true;
+            }
+            if (changed)
+                UpdatePattern(null, data);
+        }
+        LoadPatternDescriptors();
+    }
+
+    public void DeletePattern()
+    {
+        File.Delete(DESCRIPTOR_PATH + _selected.name + ".xml");
+        LoadPatternDescriptors();
+        if (_prefabsList.Count > 0)
+            SelectPattern(_prefabsList[0]);
     }
 
     public void UpdatePattern(string oldName, PatternDescriptorData data)
     {
         if (oldName != null)
+        {
+            updateOldName(oldName, data.name);
             File.Delete(DESCRIPTOR_PATH + oldName + ".xml");
+        }
+        Debug.Log("UPDATE " + data.name);
         System.Xml.Serialization.XmlSerializer writer = new System.Xml.Serialization.XmlSerializer(typeof(PatternDescriptorData));
         FileStream fs = new FileStream(DESCRIPTOR_PATH + data.name + ".xml", FileMode.Create);
         writer.Serialize(fs, data);
         fs.Close();
-        LoadPatternDescriptors();
     }
 
     public PatternDescriptorData GetDataFromFile(string name)
@@ -81,7 +133,6 @@ public class PatternListController : MonoBehaviour {
 
     public void CreateNewPattern()
     {
-        Debug.Log("creating new pattern");
         PatternDescriptorData data = new PatternDescriptorData();
         data.name = "default";
         data.rarity = 0;
@@ -89,14 +140,35 @@ public class PatternListController : MonoBehaviour {
         for (int i = 0; i < 25; ++i)
             data.patternDesign.Add("Empty");
         UpdatePattern(null, data);
-        _selected = data;
         LoadPatternDescriptors();
+        SelectPattern(data);
+    }
+
+    public void SelectPattern(PatternDescriptorData data)
+    {
+        if (!_infos.isLocked())
+        {
+            _selected = data;
+            _display.LoadPattern(_selected);
+            _infos.SetInfos(_selected);
+        }
+        else
+        {
+            _forbidden.LoadForbiddenDisplay(GetDataFromFile(data.name));
+        }
     }
 
     public void SelectPattern(GameObject selected)
     {
-        _selected = GetDataFromFile(selected.GetComponent<Text>().text);
-        display.GetComponent<PatternDisplay>().LoadPattern(_selected);
-        infosPanel.GetComponent<PatternInfosManager>().SetInfos(_selected.name, _selected.rarity, _selected.type);
+        if (!_infos.isLocked())
+        {
+            _selected = GetDataFromFile(selected.GetComponent<Text>().text);
+            _display.LoadPattern(_selected);
+            _infos.SetInfos(_selected);
+        }
+        else
+        {
+            _forbidden.LoadForbiddenDisplay(GetDataFromFile(selected.GetComponent<Text>().text));
+        }
     }
 }

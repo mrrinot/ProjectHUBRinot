@@ -13,7 +13,6 @@ public class PatternFileEvent : MonoBehaviour {
 
     public void OnClick()
     {
-        Debug.Log("LOAD " + gameObject.GetComponent<Text>().text);
         _parentGrid.GetComponent<PatternListController>().SelectPattern(this.gameObject);
     }
 }

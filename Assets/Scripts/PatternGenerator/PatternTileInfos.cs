@@ -77,11 +77,13 @@ public class PatternTileInfos : MonoBehaviour, IPointerClickHandler, IBeginDragH
 
     private Image _currentImage;
     private eTile _currentTile;
+    private PatternInfosManager _infos;
 
 	void Awake()
     {
         _currentImage = GetComponent<Image>();
         _currentTile = eTile.EMPTY;
+        _infos = GameObject.FindObjectOfType<PatternInfosManager>();
 	}
 
     public void setTile(eTile tile)
@@ -106,21 +108,24 @@ public class PatternTileInfos : MonoBehaviour, IPointerClickHandler, IBeginDragH
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        if (eventData.button == PointerEventData.InputButton.Left)
+        if (!_infos.isLocked())
         {
-            if ((byte)_currentTile == System.Enum.GetValues(typeof(eTile)).Length - 1)
-                _currentTile = eTile.EMPTY;
-            else
-                ++_currentTile;
+            if (eventData.button == PointerEventData.InputButton.Left)
+            {
+                if ((byte)_currentTile == System.Enum.GetValues(typeof(eTile)).Length - 1)
+                    _currentTile = eTile.EMPTY;
+                else
+                    ++_currentTile;
 
+            }
+            else if (eventData.button == PointerEventData.InputButton.Right)
+            {
+                if ((byte)_currentTile == 0)
+                    _currentTile = eTile.WALL;
+                else
+                    --_currentTile;
+            }
+            _currentImage.sprite = Resources.Load(tileToString[_currentTile], typeof(Sprite)) as Sprite;
         }
-        else if (eventData.button == PointerEventData.InputButton.Right)
-        {
-            if ((byte)_currentTile == 0)
-                _currentTile = eTile.WALL;
-            else
-                --_currentTile;
-        }
-        _currentImage.sprite = Resources.Load(tileToString[_currentTile], typeof(Sprite)) as Sprite;
     }
 }

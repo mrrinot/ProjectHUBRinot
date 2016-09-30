@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<PatternDescriptorData xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <name>Trap01</name>
+  <rarity>10</rarity>
+  <type>TRAP</type>
+  <patternDesign>
+    <string>Grass</string>
+    <string>Empty</string>
+    <string>Grass</string>
+    <string>Grass</string>
+    <string>Empty</string>
+    <string>Empty</string>
+    <string>Trap</string>
+    <string>Empty</string>
+    <string>Grass</string>
+    <string>Grass</string>
+    <string>Wall</string>
+    <string>Pallet</string>
+    <string>Wall</string>
+    <string>Empty</string>
+    <string>Empty</string>
+    <string>Empty</string>
+    <string>Empty</string>
+    <string>Wall</string>
+    <string>Empty</string>
+    <string>Empty</string>
+    <string>Empty</string>
+    <string>Grass</string>
+    <string>Empty</string>
+    <string>Empty</string>
+    <string>Wall</string>
+  </patternDesign>
+  <upFor />
+  <downFor />
+  <leftFor />
+  <rightFor />
+</PatternDescriptorData>

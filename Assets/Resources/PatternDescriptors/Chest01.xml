@@ -1,34 +1,34 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <PatternDescriptorData xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <name>Test</name>
-  <rarity>120</rarity>
-  <type>START</type>
+  <name>Chest01</name>
+  <rarity>15</rarity>
+  <type>CHEST</type>
   <patternDesign>
+    <string>Grass</string>
     <string>Empty</string>
     <string>Empty</string>
+    <string>Wall</string>
+    <string>Wall</string>
     <string>Empty</string>
-    <string>Pallet</string>
+    <string>Grass</string>
+    <string>Empty</string>
     <string>Grass</string>
     <string>Empty</string>
     <string>Empty</string>
     <string>Empty</string>
+    <string>Empty</string>
+    <string>Empty</string>
+    <string>Empty</string>
+    <string>Wall</string>
+    <string>Chest</string>
     <string>Grass</string>
-    <string>Chest</string>
-    <string>Empty</string>
-    <string>Empty</string>
-    <string>Chest</string>
     <string>Grass</string>
+    <string>Wall</string>
+    <string>Wall</string>
+    <string>Wall</string>
     <string>Empty</string>
-    <string>Empty</string>
-    <string>Chest</string>
-    <string>Empty</string>
-    <string>Empty</string>
-    <string>Torch</string>
-    <string>Empty</string>
-    <string>Empty</string>
-    <string>Empty</string>
-    <string>Empty</string>
-    <string>Torch</string>
+    <string>Wall</string>
+    <string>Wall</string>
   </patternDesign>
   <upFor />
   <downFor />
