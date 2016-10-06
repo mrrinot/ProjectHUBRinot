@@ -4,76 +4,8 @@ using System.Collections.Generic;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
-public enum ePatternType : byte
+public class PatternTileInfos : MonoBehaviour, IPointerClickHandler, IBeginDragHandler, IDragHandler
 {
-    GENERIC = 0,
-    START,
-    END,
-    TORCH,
-    CHEST,
-    TRAP
-}
-
-[System.Serializable]
-public class PatternDescriptorData
-{
-    public string name;
-    public int rarity;
-    public ePatternType type;
-    public List<string> patternDesign;
-    public List<string> upFor;
-    public List<string> downFor;
-    public List<string> leftFor;
-    public List<string> rightFor;
-
-    public PatternDescriptorData()
-    {
-        patternDesign = new List<string>();
-        upFor = new List<string>();
-        downFor = new List<string>();
-        leftFor = new List<string>();
-        rightFor = new List<string>();
-    }
-}
-
-public class PatternTileInfos : MonoBehaviour, IPointerClickHandler, IBeginDragHandler, IDragHandler {
-
-    public enum eTile : byte
-    {
-        EMPTY = 0,
-        GRASS,
-        PALLET,
-        CHEST,
-        TRAP,
-        START,
-        EXIT,
-        TORCH,
-        WALL
-    }
-
-    public static Dictionary<eTile, string> tileToString = new Dictionary<eTile, string>() { 
-        { eTile.EMPTY, "Empty" },
-        { eTile.GRASS, "Grass" },
-        { eTile.PALLET, "Pallet" },
-        { eTile.CHEST, "Chest" },
-        { eTile.TRAP, "Trap" },
-        { eTile.START, "Start" },
-        { eTile.EXIT, "Exit" },
-        { eTile.TORCH, "Torch" },
-        { eTile.WALL, "Wall" },
-    };
-
-    public static Dictionary<string, eTile> stringToTile = new Dictionary<string, eTile>() { 
-        { "Empty", eTile.EMPTY },
-        { "Grass", eTile.GRASS },
-        { "Pallet", eTile.PALLET },
-        { "Chest", eTile.CHEST },
-        { "Trap", eTile.TRAP },
-        { "Start", eTile.START },
-        { "Exit", eTile.EXIT },
-        { "Torch", eTile.TORCH },
-        { "Wall", eTile.WALL },
-    };
 
     private Image _currentImage;
     private eTile _currentTile;
@@ -89,12 +21,12 @@ public class PatternTileInfos : MonoBehaviour, IPointerClickHandler, IBeginDragH
     public void setTile(eTile tile)
     {
         _currentTile = tile;
-        _currentImage.sprite = Resources.Load(tileToString[_currentTile], typeof(Sprite)) as Sprite;
+        _currentImage.sprite = Resources.Load(PatternInfos.tileToString[_currentTile], typeof(Sprite)) as Sprite;
     }
 
     public string getTile()
     {
-        return tileToString[_currentTile];
+        return PatternInfos.tileToString[_currentTile];
     }
 
     public void OnBeginDrag(PointerEventData eventData)
@@ -125,7 +57,7 @@ public class PatternTileInfos : MonoBehaviour, IPointerClickHandler, IBeginDragH
                 else
                     --_currentTile;
             }
-            _currentImage.sprite = Resources.Load(tileToString[_currentTile], typeof(Sprite)) as Sprite;
+            _currentImage.sprite = Resources.Load(PatternInfos.tileToString[_currentTile], typeof(Sprite)) as Sprite;
         }
     }
 }

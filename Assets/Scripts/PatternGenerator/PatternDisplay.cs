@@ -7,19 +7,15 @@ public class PatternDisplay : MonoBehaviour {
 
     public GameObject tilePrefab;
 
-    private PatternDescriptorData _currentPattern = null;
     private List<GameObject> _patternTileList;
-    private Image _panelImage;
 
     void Awake()
     {
         _patternTileList = new List<GameObject>();
-        _panelImage = GetComponent<Image>();
     }
 
     public void LoadPattern(PatternDescriptorData data)
     {
-        _currentPattern = data;
         foreach (GameObject obj in _patternTileList)
             GameObject.Destroy(obj);
         _patternTileList.Clear();
@@ -30,7 +26,7 @@ public class PatternDisplay : MonoBehaviour {
             tile.transform.parent = this.transform;
             tile.transform.localScale = new Vector3(1, 1, 1);
             PatternTileInfos infos = tile.GetComponent<PatternTileInfos>();
-            infos.setTile(PatternTileInfos.stringToTile[patternName]);
+            infos.setTile(PatternInfos.stringToTile[patternName]);
         }
     }
 

@@ -21,7 +21,6 @@ public class PatternListController : MonoBehaviour {
     public GameObject display;
     public GameObject forbidden;
     public GameObject infosPanel;
-    public static string DESCRIPTOR_PATH = "Assets/Resources/PatternDescriptors/";
     public GameObject filePrefab;
 
     void Start()
@@ -68,7 +67,7 @@ public class PatternListController : MonoBehaviour {
 
     public void DeletePattern()
     {
-        File.Delete(DESCRIPTOR_PATH + _selected.name + ".xml");
+        File.Delete(PatternInfos.DESCRIPTOR_PATH + _selected.name + ".xml");
         LoadPatternDescriptors();
         if (_prefabsList.Count > 0)
             SelectPattern(_prefabsList[0]);
@@ -79,11 +78,11 @@ public class PatternListController : MonoBehaviour {
         if (oldName != null)
         {
             updateOldName(oldName, data.name);
-            File.Delete(DESCRIPTOR_PATH + oldName + ".xml");
+            File.Delete(PatternInfos.DESCRIPTOR_PATH + oldName + ".xml");
         }
         Debug.Log("UPDATE " + data.name);
         System.Xml.Serialization.XmlSerializer writer = new System.Xml.Serialization.XmlSerializer(typeof(PatternDescriptorData));
-        FileStream fs = new FileStream(DESCRIPTOR_PATH + data.name + ".xml", FileMode.Create);
+        FileStream fs = new FileStream(PatternInfos.DESCRIPTOR_PATH + data.name + ".xml", FileMode.Create);
         writer.Serialize(fs, data);
         fs.Close();
     }
@@ -92,14 +91,14 @@ public class PatternListController : MonoBehaviour {
     {
         PatternDescriptorData data = new PatternDescriptorData();
         System.Xml.Serialization.XmlSerializer reader = new System.Xml.Serialization.XmlSerializer(typeof(PatternDescriptorData));
-        FileStream fs = new FileStream(DESCRIPTOR_PATH + name + ".xml", FileMode.Open);
+        FileStream fs = new FileStream(PatternInfos.DESCRIPTOR_PATH + name + ".xml", FileMode.Open);
         try
         {
             data = reader.Deserialize(fs) as PatternDescriptorData;
         }
         catch
         {
-            Debug.LogError("File " + DESCRIPTOR_PATH + name + ".xml" + " could not open !");
+            Debug.LogError("File " + PatternInfos.DESCRIPTOR_PATH + name + ".xml" + " could not open !");
             fs.Close();
             return null;
         }
@@ -113,12 +112,12 @@ public class PatternListController : MonoBehaviour {
             GameObject.Destroy(obj);
         _prefabsList.Clear();
         _descriptorsList.Clear();
-        string[] fileEntries = Directory.GetFiles(DESCRIPTOR_PATH);
+        string[] fileEntries = Directory.GetFiles(PatternInfos.DESCRIPTOR_PATH);
         foreach (string file in fileEntries)
         {
             if (!file.Contains(".meta"))
             {
-                _descriptorsList.Add(file.Substring(DESCRIPTOR_PATH.Length, file.LastIndexOf(".") - DESCRIPTOR_PATH.Length));
+                _descriptorsList.Add(file.Substring(PatternInfos.DESCRIPTOR_PATH.Length, file.LastIndexOf(".") - PatternInfos.DESCRIPTOR_PATH.Length));
             }
         }
         foreach (string file in _descriptorsList)
