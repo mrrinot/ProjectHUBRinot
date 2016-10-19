@@ -62,9 +62,25 @@ public class MapPattern
 
 }
 
+public class MapTile
+{
+    public int posX;
+    public int posY;
+    public GameObject obj;
+    public eTile tileType;
+
+    public MapTile(int x, int y, GameObject o)
+    {
+        posX = x;
+        posY = y;
+        obj = o;
+    }
+}
+
 public class MapGenerator : MonoBehaviour
 {
     public static string BLOCK_PATH = "Blocks/";
+    public static int RAND_NEW_BLOCK = 65;
 
     private Dictionary<ePatternType, PatternTypeInfos> _typeDict = new Dictionary<ePatternType, PatternTypeInfos>()
     {
@@ -77,7 +93,7 @@ public class MapGenerator : MonoBehaviour
     private Dictionary<ePatternType, List<PatternDescriptorData>> _patterns = new Dictionary<ePatternType, List<PatternDescriptorData>>();
     private Dictionary<ePatternType, int> _totalPatternsRarity = new Dictionary<ePatternType, int>();
     private Dictionary<eTile, GameObject> _tilePrefabsDict = new Dictionary<eTile, GameObject>();
-    private List<GameObject> _tileList = new List<GameObject>();
+    private List<MapTile> _tileList = new List<MapTile>();
     private List<MapPattern> _allTiles = new List<MapPattern>();
     private List<MapPattern> _emptyTiles = new List<MapPattern>();
 
@@ -148,11 +164,16 @@ public class MapGenerator : MonoBehaviour
 
     void eraseMap()
     {
-        foreach (GameObject obj in _tileList)
-            GameObject.Destroy(obj);
+        foreach (MapTile tile in _tileList)
+            GameObject.Destroy(tile.obj);
         _tileList.Clear();
         _allTiles.Clear();
         _emptyTiles.Clear();
+    }
+
+    List<MapTile> GetMap()
+    {
+        return _tileList;
     }
 
     #endregion
@@ -204,7 +225,26 @@ public class MapGenerator : MonoBehaviour
         return list.FirstOrDefault(tile => tile.posX == posX && tile.posY == posY);
     }
 
-    MapPattern getRandomEmptyTile()
+    MapPattern getRandomEmptyFurthestTile()
+    {
+        int maxRange = 0;
+        List<MapPattern> furthest = new List<MapPattern>();
+        foreach (MapPattern patt in _emptyTiles)
+        {
+            if (Mathf.Abs(patt.posX) + Mathf.Abs(patt.posY) > maxRange)
+                maxRange = Mathf.Abs(patt.posX) + Mathf.Abs(patt.posY);
+        }
+        foreach (MapPattern patt in _emptyTiles)
+        {
+            if (Mathf.Abs(patt.posX) + Mathf.Abs(patt.posY) == maxRange)
+                furthest.Add(patt);
+        }
+        MapPattern chosen = furthest[UnityEngine.Random.Range(0, furthest.Count - 1)];
+        _emptyTiles.Remove(chosen);
+        return chosen;
+    }
+
+    MapPattern getRandomEmptyClosestTile()
     {
         List<MapPattern> closest = new List<MapPattern>();
         int rangeMin = Mathf.Abs(_emptyTiles[0].posX) + Mathf.Abs(_emptyTiles[0].posY);
@@ -222,47 +262,56 @@ public class MapGenerator : MonoBehaviour
 
     #region creation
 
-    void addNearbyTiles(MapPattern added)
+    bool addTile(List<string> forbList, int posX, int posY)
     {
         MapPattern existing = null;
+        bool ret = UnityEngine.Random.Range(1, 100) > RAND_NEW_BLOCK;
+        bool newOne = false;
 
-        // RIGHT TILE
-        if ((existing = getTileFromPos(added.posX + 1, added.posY, _allTiles)) == null)
+        if ((existing = getTileFromPos(posX, posY, _allTiles)) == null)
         {
-            existing = new MapPattern(added.posX + 1, added.posY, null);
-            _allTiles.Add(existing);
-            _emptyTiles.Add(existing);
+            if (ret)
+            {
+                Debug.Log("ADDED tile in " + posX + "/" + posY);
+                newOne = true;
+                existing = new MapPattern(posX, posY, null);
+                _allTiles.Add(existing);
+                _emptyTiles.Add(existing);
+            }
         }
-        existing.AddForbiddenPattern(added.currentPattern.rightFor);
-        // LEFT TILE
-        if ((existing = getTileFromPos(added.posX - 1, added.posY, _allTiles)) == null)
-        {
-            existing = new MapPattern(added.posX - 1, added.posY, null);
-            _allTiles.Add(existing);
-            _emptyTiles.Add(existing);
-        }
-        existing.AddForbiddenPattern(added.currentPattern.leftFor);
-        // UP TILE
-        if ((existing = getTileFromPos(added.posX, added.posY + 1, _allTiles)) == null)
-        {
-            existing = new MapPattern(added.posX, added.posY + 1, null);
-            _allTiles.Add(existing);
-            _emptyTiles.Add(existing);
-        }
-        existing.AddForbiddenPattern(added.currentPattern.upFor);
-        // DOWN TILE
-        if ((existing = getTileFromPos(added.posX, added.posY - 1, _allTiles)) == null)
-        {
-            existing = new MapPattern(added.posX, added.posY - 1, null);
-            _allTiles.Add(existing);
-            _emptyTiles.Add(existing);
-        }
-        existing.AddForbiddenPattern(added.currentPattern.downFor);
+        if (ret)
+            existing.AddForbiddenPattern(forbList);
+        return newOne;
     }
 
-    void addPatternOfType(ePatternType type)
+    void addNearbyTiles(MapPattern added)
     {
-        MapPattern chosen = getRandomEmptyTile();
+        int cpt = 0;
+        int i = 0;
+        while (cpt == 0 && i < 100)
+        {
+            if (addTile(added.currentPattern.rightFor, added.posX + 1, added.posY))
+                ++cpt;
+            if (addTile(added.currentPattern.leftFor, added.posX - 1, added.posY))
+                ++cpt;
+            if (addTile(added.currentPattern.upFor, added.posX, added.posY + 1))
+                ++cpt;
+            if (addTile(added.currentPattern.downFor, added.posX, added.posY - 1))
+                ++cpt;
+            ++i;
+        }
+        Debug.Log("i = " + i);
+    }
+
+    void setPatternOfType(ePatternType type)
+    {
+        Debug.Log("AVAILABLE PATTERN = " + _emptyTiles.Count);
+        MapPattern chosen = null;
+        if (type == ePatternType.END)
+            chosen = getRandomEmptyFurthestTile();
+        else
+            chosen = getRandomEmptyClosestTile();
+        Debug.Log("Chosen is :" + chosen.posX + "/" + chosen.posY);
         PatternDescriptorData data = getRandomPatternOfType(type, chosen.forbiddenPattern);
         Debug.Log("chosen pattern rarity = " + data.rarity + " of type = " + type);
         chosen.currentPattern = data;
@@ -277,30 +326,79 @@ public class MapGenerator : MonoBehaviour
         eraseMap();
         _allTiles.Add(addedPattern);
         _emptyTiles.Add(addedPattern);
-        addPatternOfType(ePatternType.START);
+        setPatternOfType(ePatternType.START);
         for (int i = 1; i < patternNumber; ++i)
         {
             tileType = getRandomPatternType();
             changeTypeRarity(tileType);
-            addPatternOfType(tileType);
+            setPatternOfType(tileType);
         }
-        addPatternOfType(ePatternType.END);
+        setPatternOfType(ePatternType.END);
     }
 
     void InstantiateMap()
     {
         foreach (MapPattern pattern in _allTiles)
         {
-            if (pattern.currentPattern != null)
+            if (pattern != null && pattern.currentPattern != null)
             {
                 List<string> tileList = pattern.currentPattern.patternDesign;
                 for (int i = 0; i < tileList.Count; ++i)
                 {
                     GameObject block = Instantiate(_tilePrefabsDict[PatternInfos.stringToTile[tileList[i]]], new Vector3((i % 5) + (5 * pattern.posX), (i / 5) + (5 * pattern.posY)), Quaternion.identity) as GameObject;
-                    _tileList.Add(block);
+                    MapTile tile = new MapTile((int)block.transform.position.x, (int)block.transform.position.y, block);
+                    _tileList.Add(tile);
+                }
+
+                MapPattern nextTo = null;
+                // RIGHT
+                if ((nextTo = getTileFromPos(pattern.posX + 1, pattern.posY, _allTiles)) == null || nextTo.currentPattern == null)
+                {
+                    for (int i = 0; i < 5; ++i)
+                    {
+                        GameObject block = Instantiate(_tilePrefabsDict[eTile.WALLMAP], new Vector3(4 + (5 * pattern.posX + 1), (i % 5) + (5 * pattern.posY)), Quaternion.identity) as GameObject;
+                        MapTile tile = new MapTile((int)block.transform.position.x, (int)block.transform.position.y, block);
+                        _tileList.Add(tile);
+                    }
+                }
+                //LEFT
+                if ((nextTo = getTileFromPos(pattern.posX - 1, pattern.posY, _allTiles)) == null || nextTo.currentPattern == null)
+                {
+                    for (int i = 0; i < 5; ++i)
+                    {
+                        GameObject block = Instantiate(_tilePrefabsDict[eTile.WALLMAP], new Vector3(0 + (5 * pattern.posX - 1), (i % 5) + (5 * pattern.posY)), Quaternion.identity) as GameObject;
+                        MapTile tile = new MapTile((int)block.transform.position.x, (int)block.transform.position.y, block);
+                        _tileList.Add(tile);
+                    }
+                }
+                //UP
+                if ((nextTo = getTileFromPos(pattern.posX, pattern.posY + 1, _allTiles)) == null || nextTo.currentPattern == null)
+                {
+                    for (int i = 0; i < 5; ++i)
+                    {
+                        GameObject block = Instantiate(_tilePrefabsDict[eTile.WALLMAP], new Vector3((i % 5) + (5 * pattern.posX), 4 + (5 * pattern.posY + 1)), Quaternion.identity) as GameObject;
+                        MapTile tile = new MapTile((int)block.transform.position.x, (int)block.transform.position.y, block);
+                        _tileList.Add(tile);
+                    }
+                }
+                //LEFT
+                if ((nextTo = getTileFromPos(pattern.posX, pattern.posY - 1, _allTiles)) == null || nextTo.currentPattern == null)
+                {
+                    for (int i = 0; i < 5; ++i)
+                    {
+                        GameObject block = Instantiate(_tilePrefabsDict[eTile.WALLMAP], new Vector3((i % 5) + (5 * pattern.posX), 0 + (5 * pattern.posY - 1)), Quaternion.identity) as GameObject;
+                        MapTile tile = new MapTile((int)block.transform.position.x, (int)block.transform.position.y, block);
+                        _tileList.Add(tile);
+                    }
                 }
             }
+            adjustMap();
         }
+
+    }
+
+    void adjustMap()
+    {
     }
 
     #endregion
