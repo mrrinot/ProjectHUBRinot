@@ -23,7 +23,7 @@ public class PatternDisplay : MonoBehaviour {
         {
             GameObject tile = Instantiate(tilePrefab, Vector3.zero, Quaternion.identity) as GameObject;
             _patternTileList.Add(tile);
-            tile.transform.parent = this.transform;
+            tile.transform.SetParent(this.transform);
             tile.transform.localScale = new Vector3(1, 1, 1);
             PatternTileInfos infos = tile.GetComponent<PatternTileInfos>();
             infos.setTile(PatternInfos.stringToTile[patternName]);

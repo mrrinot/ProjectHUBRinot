@@ -62,18 +62,64 @@ public class MapPattern
 
 }
 
-public class MapTile
+public class MapHolder
 {
-    public int posX;
-    public int posY;
-    public GameObject obj;
-    public eTile tileType;
+    BlockController[][] _map;
+    int _minX, _maxX, _minY, _maxY;
 
-    public MapTile(int x, int y, GameObject o)
+    public BlockController GetBlock(int x, int y)
     {
-        posX = x;
-        posY = y;
-        obj = o;
+        return _map[x - _minX][y - _minY];
+    }
+
+    public void EraseMap()
+    {
+        for (int i = 0; i < _maxX - _minX; ++i)
+            for (int j = 0; j < _maxY - _minY; ++j)
+                GameObject.Destroy(_map[i][j].gameObject);
+    }
+
+    public List<BlockController> GetAllBlocksWith(List<e_Object> include)
+    {
+        List<BlockController> results = new List<BlockController>();
+
+        for (int i = 0; i < _maxX - _minX; ++i)
+            for (int j = 0; j < _maxY - _minY; ++j)
+            {
+                BlockController block = _map[i][j];
+                if (block != null)
+                    foreach (e_Object obj in include)
+                    {
+                        if (block.HasObject(obj))
+                        {
+                            results.Add(block);
+                            break;
+                        }
+                    }
+            }
+        return results;
+    }
+
+    public MapHolder(int minX, int maxX, int minY, int maxY, List<BlockController> blockList)
+    {
+        _minX = minX;
+        _maxX = maxX;
+        _minY = minY;
+        _maxY = maxY;
+        _map = new BlockController[_maxX - _minX][];
+        //Debug.Log("X SIZE = " + (_maxX - _minX));
+        //Debug.Log("Y SIZE = " + (_maxY - _minY));
+        for (int i = 0; i < _maxX - _minX; ++i)
+        {
+            _map[i] = new BlockController[_maxY - _minY];
+            for (int j = 0; j < _maxY - _minY; ++j)
+                _map[i][j] = null;
+        }
+        foreach (BlockController block in blockList)
+        {
+            //Debug.Log("x/y = "+block.X+"/"+block.Y+" ==>"+(block.X - _minX) + "/"+(block.Y - _minY));
+            _map[block.X - _minX][block.Y - _minY] = block;
+        }
     }
 }
 
@@ -93,9 +139,9 @@ public class MapGenerator : MonoBehaviour
     private Dictionary<ePatternType, List<PatternDescriptorData>> _patterns = new Dictionary<ePatternType, List<PatternDescriptorData>>();
     private Dictionary<ePatternType, int> _totalPatternsRarity = new Dictionary<ePatternType, int>();
     private Dictionary<eTile, GameObject> _tilePrefabsDict = new Dictionary<eTile, GameObject>();
-    private List<MapTile> _tileList = new List<MapTile>();
-    private List<MapPattern> _allTiles = new List<MapPattern>();
-    private List<MapPattern> _emptyTiles = new List<MapPattern>();
+    private MapHolder _map = null;
+    private List<MapPattern> _allPatterns = new List<MapPattern>();
+    private List<MapPattern> _emptyPatterns = new List<MapPattern>();
 
     void Awake()
     {
@@ -164,16 +210,15 @@ public class MapGenerator : MonoBehaviour
 
     void eraseMap()
     {
-        foreach (MapTile tile in _tileList)
-            GameObject.Destroy(tile.obj);
-        _tileList.Clear();
-        _allTiles.Clear();
-        _emptyTiles.Clear();
+        if (_map != null)
+            _map.EraseMap();
+        _allPatterns.Clear();
+        _emptyPatterns.Clear();
     }
 
-    List<MapTile> GetMap()
+    MapHolder GetMap()
     {
-        return _tileList;
+        return _map;
     }
 
     #endregion
@@ -182,14 +227,14 @@ public class MapGenerator : MonoBehaviour
     ePatternType getRandomPatternType()
     {
         int total = 0;
-        Debug.Log("/////// \n Pattern types rarity");
+        //Debug.Log("/////// \n Pattern types rarity");
         foreach (KeyValuePair<ePatternType, PatternTypeInfos> infos in _typeDict)
         {
-            Debug.Log("TYPE = " + infos.Key + " ==> " + infos.Value.currentRarity);
+            //Debug.Log("TYPE = " + infos.Key + " ==> " + infos.Value.currentRarity);
             total += infos.Value.currentRarity;
         }
         int random = UnityEngine.Random.Range(1, total);
-        Debug.Log("total = " + total + " RANDOM = " + random + " \\\\\\\\\\ \n");
+        //Debug.Log("total = " + total + " RANDOM = " + random + " \\\\\\\\\\ \n");
         foreach (KeyValuePair<ePatternType, PatternTypeInfos> infos in _typeDict)
         {
             random -= infos.Value.currentRarity;
@@ -229,32 +274,32 @@ public class MapGenerator : MonoBehaviour
     {
         int maxRange = 0;
         List<MapPattern> furthest = new List<MapPattern>();
-        foreach (MapPattern patt in _emptyTiles)
+        foreach (MapPattern patt in _emptyPatterns)
         {
             if (Mathf.Abs(patt.posX) + Mathf.Abs(patt.posY) > maxRange)
                 maxRange = Mathf.Abs(patt.posX) + Mathf.Abs(patt.posY);
         }
-        foreach (MapPattern patt in _emptyTiles)
+        foreach (MapPattern patt in _emptyPatterns)
         {
             if (Mathf.Abs(patt.posX) + Mathf.Abs(patt.posY) == maxRange)
                 furthest.Add(patt);
         }
         MapPattern chosen = furthest[UnityEngine.Random.Range(0, furthest.Count - 1)];
-        _emptyTiles.Remove(chosen);
+        _emptyPatterns.Remove(chosen);
         return chosen;
     }
 
     MapPattern getRandomEmptyClosestTile()
     {
         List<MapPattern> closest = new List<MapPattern>();
-        int rangeMin = Mathf.Abs(_emptyTiles[0].posX) + Mathf.Abs(_emptyTiles[0].posY);
-        foreach (MapPattern patt in _emptyTiles)
+        int rangeMin = Mathf.Abs(_emptyPatterns[0].posX) + Mathf.Abs(_emptyPatterns[0].posY);
+        foreach (MapPattern patt in _emptyPatterns)
         {
             if (Mathf.Abs(patt.posX) + Mathf.Abs(patt.posY) <= rangeMin)
                 closest.Add(patt);
         }
         MapPattern chosen = closest[UnityEngine.Random.Range(0, closest.Count - 1)];
-        _emptyTiles.Remove(chosen);
+        _emptyPatterns.Remove(chosen);
         return chosen;
     }
 
@@ -268,15 +313,15 @@ public class MapGenerator : MonoBehaviour
         bool ret = UnityEngine.Random.Range(1, 100) > RAND_NEW_BLOCK;
         bool newOne = false;
 
-        if ((existing = getTileFromPos(posX, posY, _allTiles)) == null)
+        if ((existing = getTileFromPos(posX, posY, _allPatterns)) == null)
         {
             if (ret)
             {
-                Debug.Log("ADDED tile in " + posX + "/" + posY);
+                //Debug.Log("ADDED tile in " + posX + "/" + posY);
                 newOne = true;
                 existing = new MapPattern(posX, posY, null);
-                _allTiles.Add(existing);
-                _emptyTiles.Add(existing);
+                _allPatterns.Add(existing);
+                _emptyPatterns.Add(existing);
             }
         }
         if (ret)
@@ -300,20 +345,20 @@ public class MapGenerator : MonoBehaviour
                 ++cpt;
             ++i;
         }
-        Debug.Log("i = " + i);
+        //Debug.Log("i = " + i);
     }
 
     void setPatternOfType(ePatternType type)
     {
-        Debug.Log("AVAILABLE PATTERN = " + _emptyTiles.Count);
+        //Debug.Log("AVAILABLE PATTERN = " + _emptyPatterns.Count);
         MapPattern chosen = null;
         if (type == ePatternType.END)
             chosen = getRandomEmptyFurthestTile();
         else
             chosen = getRandomEmptyClosestTile();
-        Debug.Log("Chosen is :" + chosen.posX + "/" + chosen.posY);
+        //Debug.Log("Chosen is :" + chosen.posX + "/" + chosen.posY);
         PatternDescriptorData data = getRandomPatternOfType(type, chosen.forbiddenPattern);
-        Debug.Log("chosen pattern rarity = " + data.rarity + " of type = " + type);
+        //Debug.Log("chosen pattern rarity = " + data.rarity + " of type = " + type);
         chosen.currentPattern = data;
         addNearbyTiles(chosen);
     }
@@ -324,8 +369,8 @@ public class MapGenerator : MonoBehaviour
         ePatternType tileType;
 
         eraseMap();
-        _allTiles.Add(addedPattern);
-        _emptyTiles.Add(addedPattern);
+        _allPatterns.Add(addedPattern);
+        _emptyPatterns.Add(addedPattern);
         setPatternOfType(ePatternType.START);
         for (int i = 1; i < patternNumber; ++i)
         {
@@ -338,67 +383,94 @@ public class MapGenerator : MonoBehaviour
 
     void InstantiateMap()
     {
-        foreach (MapPattern pattern in _allTiles)
+        int maxX = 0, maxY = 0, minX = 0, minY = 0;
+        List<BlockController> blockList = new List<BlockController>();
+        foreach (MapPattern pattern in _allPatterns)
         {
             if (pattern != null && pattern.currentPattern != null)
             {
+                if (pattern.posX < minX)
+                    minX = pattern.posX;
+                if (pattern.posX > maxX)
+                    maxX = pattern.posX;
+                if (pattern.posY < minY)
+                    minY = pattern.posY;
+                if (pattern.posY > maxY)
+                    maxY = pattern.posY;
                 List<string> tileList = pattern.currentPattern.patternDesign;
                 for (int i = 0; i < tileList.Count; ++i)
                 {
                     GameObject block = Instantiate(_tilePrefabsDict[PatternInfos.stringToTile[tileList[i]]], new Vector3((i % 5) + (5 * pattern.posX), (i / 5) + (5 * pattern.posY)), Quaternion.identity) as GameObject;
-                    MapTile tile = new MapTile((int)block.transform.position.x, (int)block.transform.position.y, block);
-                    _tileList.Add(tile);
+                    blockList.Add(block.GetComponent<BlockController>());
                 }
 
                 MapPattern nextTo = null;
                 // RIGHT
-                if ((nextTo = getTileFromPos(pattern.posX + 1, pattern.posY, _allTiles)) == null || nextTo.currentPattern == null)
+                if ((nextTo = getTileFromPos(pattern.posX + 1, pattern.posY, _allPatterns)) == null || nextTo.currentPattern == null)
                 {
                     for (int i = 0; i < 5; ++i)
                     {
                         GameObject block = Instantiate(_tilePrefabsDict[eTile.WALLMAP], new Vector3(4 + (5 * pattern.posX + 1), (i % 5) + (5 * pattern.posY)), Quaternion.identity) as GameObject;
-                        MapTile tile = new MapTile((int)block.transform.position.x, (int)block.transform.position.y, block);
-                        _tileList.Add(tile);
+                        blockList.Add(block.GetComponent<BlockController>());
                     }
                 }
                 //LEFT
-                if ((nextTo = getTileFromPos(pattern.posX - 1, pattern.posY, _allTiles)) == null || nextTo.currentPattern == null)
+                if ((nextTo = getTileFromPos(pattern.posX - 1, pattern.posY, _allPatterns)) == null || nextTo.currentPattern == null)
                 {
                     for (int i = 0; i < 5; ++i)
                     {
                         GameObject block = Instantiate(_tilePrefabsDict[eTile.WALLMAP], new Vector3(0 + (5 * pattern.posX - 1), (i % 5) + (5 * pattern.posY)), Quaternion.identity) as GameObject;
-                        MapTile tile = new MapTile((int)block.transform.position.x, (int)block.transform.position.y, block);
-                        _tileList.Add(tile);
+                        blockList.Add(block.GetComponent<BlockController>());
                     }
                 }
                 //UP
-                if ((nextTo = getTileFromPos(pattern.posX, pattern.posY + 1, _allTiles)) == null || nextTo.currentPattern == null)
+                if ((nextTo = getTileFromPos(pattern.posX, pattern.posY + 1, _allPatterns)) == null || nextTo.currentPattern == null)
                 {
                     for (int i = 0; i < 5; ++i)
                     {
                         GameObject block = Instantiate(_tilePrefabsDict[eTile.WALLMAP], new Vector3((i % 5) + (5 * pattern.posX), 4 + (5 * pattern.posY + 1)), Quaternion.identity) as GameObject;
-                        MapTile tile = new MapTile((int)block.transform.position.x, (int)block.transform.position.y, block);
-                        _tileList.Add(tile);
+                        blockList.Add(block.GetComponent<BlockController>());
                     }
                 }
                 //LEFT
-                if ((nextTo = getTileFromPos(pattern.posX, pattern.posY - 1, _allTiles)) == null || nextTo.currentPattern == null)
+                if ((nextTo = getTileFromPos(pattern.posX, pattern.posY - 1, _allPatterns)) == null || nextTo.currentPattern == null)
                 {
                     for (int i = 0; i < 5; ++i)
                     {
                         GameObject block = Instantiate(_tilePrefabsDict[eTile.WALLMAP], new Vector3((i % 5) + (5 * pattern.posX), 0 + (5 * pattern.posY - 1)), Quaternion.identity) as GameObject;
-                        MapTile tile = new MapTile((int)block.transform.position.x, (int)block.transform.position.y, block);
-                        _tileList.Add(tile);
+                        blockList.Add(block.GetComponent<BlockController>());
                     }
                 }
             }
-            adjustMap();
         }
+        minX--;
+        maxX += 2;
+        minY--;
+        maxY += 2;
+        _map = new MapHolder(minX * 5, maxX * 5, minY * 5, maxY * 5, blockList);
+        adjustMap();
 
     }
 
     void adjustMap()
     {
+        List<BlockController> pallets = _map.GetAllBlocksWith(new List<e_Object>() { e_Object.PALLET });
+
+        foreach (BlockController palletblock in pallets)
+        {
+
+            int unwalkableCount = 0;
+            if (_map.GetBlock(palletblock.X + 1, palletblock.Y).IsWalkable(e_Player.PLAYER) == false)
+                unwalkableCount++;
+            if (_map.GetBlock(palletblock.X - 1, palletblock.Y).IsWalkable(e_Player.PLAYER) == false)
+                unwalkableCount++;
+            if (_map.GetBlock(palletblock.X, palletblock.Y + 1).IsWalkable(e_Player.PLAYER) == false)
+                unwalkableCount++;
+            if (_map.GetBlock(palletblock.X, palletblock.Y - 1).IsWalkable(e_Player.PLAYER) == false)
+                unwalkableCount++;
+            if (unwalkableCount >= 3)
+                GameObject.Destroy(palletblock.GetComponentInChildren<PalletObject>().gameObject);
+        }
     }
 
     #endregion
