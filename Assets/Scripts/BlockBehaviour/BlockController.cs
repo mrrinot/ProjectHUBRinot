@@ -3,21 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-public enum e_Object
-{
-    PLAYER = 0,
-    KILLER,
-    DUMMY,
-    PALLET,
-    START,
-    EXIT,
-    CHEST,
-    TORCH,
-    GRASS,
-    TRAP,
-    WALL
-}
-
 public class BlockController : MonoBehaviour
 {
     private List<e_Object> _objectlist;
@@ -26,9 +11,11 @@ public class BlockController : MonoBehaviour
     private Dictionary<e_Player, bool> _walkable;
     private Dictionary<e_Player, bool> _visible;
     private Dictionary<e_Player, float> _heuristics;
+    private SpriteRenderer _rend;
 
 	void Awake()
     {
+        _rend = GetComponent<SpriteRenderer>();
         _objectlist = new List<e_Object>();
         _walkable = new Dictionary<e_Player, bool>();
         _visible = new Dictionary<e_Player, bool>();
@@ -105,6 +92,40 @@ public class BlockController : MonoBehaviour
     public void SetHeuristic(e_Player playerId, float heur)
     {
         _heuristics[playerId] = heur;
+    }
+
+    #endregion
+
+    #region vision
+
+    public void SetVisionAlpha(float alpha)
+    {
+        if (_rend != null)
+        {
+            Color col = _rend.color;
+            col.a = alpha;
+            _rend.color = col;
+        }
+        IObject[] objs = GetComponentsInChildren<IObject>();
+        foreach (IObject obj in objs)
+        {
+            obj.Alpha = alpha;
+        }
+    }
+
+    public void AddAlpha(float alpha)
+    {
+        if (_rend != null)
+        {
+            Color col = _rend.color;
+            col.a += alpha;
+            _rend.color = col;
+        }
+        IObject[] objs = GetComponentsInChildren<IObject>();
+        foreach (IObject obj in objs)
+        {
+            obj.Alpha += alpha;
+        }
     }
 
     #endregion

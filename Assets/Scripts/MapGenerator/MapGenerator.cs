@@ -118,6 +118,8 @@ public class MapHolder
         foreach (BlockController block in blockList)
         {
             //Debug.Log("x/y = "+block.X+"/"+block.Y+" ==>"+(block.X - _minX) + "/"+(block.Y - _minY));
+            if (_map[block.X - _minX][block.Y - _minY] != null)
+                GameObject.Destroy(_map[block.X - _minX][block.Y - _minY].gameObject);
             _map[block.X - _minX][block.Y - _minY] = block;
         }
     }
@@ -216,7 +218,7 @@ public class MapGenerator : MonoBehaviour
         _emptyPatterns.Clear();
     }
 
-    MapHolder GetMap()
+    public MapHolder GetMap()
     {
         return _map;
     }
