@@ -12,6 +12,8 @@ public class BlockController : MonoBehaviour
     private Dictionary<e_Player, bool> _visible;
     private Dictionary<e_Player, float> _heuristics;
     private SpriteRenderer _rend;
+    private float _lightBlock;
+    private float _alpha;
 
 	void Awake()
     {
@@ -28,6 +30,8 @@ public class BlockController : MonoBehaviour
         }
         _posX = (int)transform.position.x;
         _posY = (int)transform.position.y;
+        _lightBlock = 0f;
+        _alpha = 0f;
 	}
 
     #region Object
@@ -98,33 +102,33 @@ public class BlockController : MonoBehaviour
 
     #region vision
 
-    public void SetVisionAlpha(float alpha)
+    public void SetLightBlock(float block)
     {
-        if (_rend != null)
-        {
-            Color col = _rend.color;
-            col.a = alpha;
-            _rend.color = col;
-        }
-        IObject[] objs = GetComponentsInChildren<IObject>();
-        foreach (IObject obj in objs)
-        {
-            obj.Alpha = alpha;
-        }
+        _lightBlock = block;
     }
 
-    public void AddAlpha(float alpha)
+    public float GetLightBlock()
     {
-        if (_rend != null)
+        return _lightBlock;
+    }
+
+    public float Alpha
+    {
+        get { return _alpha; }
+        set
         {
-            Color col = _rend.color;
-            col.a += alpha;
-            _rend.color = col;
-        }
-        IObject[] objs = GetComponentsInChildren<IObject>();
-        foreach (IObject obj in objs)
-        {
-            obj.Alpha += alpha;
+            _alpha = value;
+            if (_rend != null)
+            {
+                Color col = _rend.color;
+                col.a = _alpha;
+                _rend.color = col;
+            }
+            IObject[] objs = GetComponentsInChildren<IObject>();
+            foreach (IObject obj in objs)
+            {
+                obj.Alpha = _alpha;
+            }
         }
     }
 

@@ -24,6 +24,8 @@ public class IObject : MonoBehaviour
     protected e_Object _type;
     [SerializeField]
     protected float _minAlpha;
+    [SerializeField]
+    protected float _reducedAlpha;
 
     protected SpriteRenderer _sprite;
     protected BlockController _bCtrl;
@@ -36,6 +38,7 @@ public class IObject : MonoBehaviour
         _sprite = GetComponent<SpriteRenderer>();
         OnAlphaChanged += HideObject;
         _bCtrl = GetComponentInParent<BlockController>();
+        _bCtrl.SetLightBlock(_reducedAlpha);
         _bCtrl.AddObject(_type);
     }
 
