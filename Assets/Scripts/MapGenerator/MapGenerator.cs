@@ -82,12 +82,12 @@ public class MapHolder
     public List<BlockController> GetAllBlocksWith(List<e_Object> include)
     {
         List<BlockController> results = new List<BlockController>();
-
         for (int i = 0; i < _maxX - _minX; ++i)
             for (int j = 0; j < _maxY - _minY; ++j)
             {
                 BlockController block = _map[i][j];
                 if (block != null)
+                {
                     foreach (e_Object obj in include)
                     {
                         if (block.HasObject(obj))
@@ -96,6 +96,7 @@ public class MapHolder
                             break;
                         }
                     }
+                }
             }
         return results;
     }

@@ -55,6 +55,11 @@ public class IObject : MonoBehaviour
             _sprite.enabled = false;
     }
 
+    public e_Object Type
+    {
+        get { return _type; }
+    }
+
     public float Alpha
     {
         get { return _alpha; }

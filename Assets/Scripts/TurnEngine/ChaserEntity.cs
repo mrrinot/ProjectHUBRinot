@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class ActionManager : MonoBehaviour {
+public class EntityAI : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
