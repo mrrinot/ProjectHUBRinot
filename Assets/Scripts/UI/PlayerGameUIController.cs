@@ -45,17 +45,27 @@ public class PlayerGameUIController : MonoBehaviour
     void Update()
     {
         if (_isTurn)
-            ManageMovement();
+            handleMouse();
     }
 
-    private void ManageMovement()
+    private BlockController getPointedBlock()
     {
+        BlockController block = null;
         RaycastHit hit;
         if (Physics.Raycast(_cam.ScreenPointToRay(Input.mousePosition), out hit, Mathf.Infinity, LayerMask.GetMask("Block")))
         {
-            BlockController block = hit.collider.GetComponent<BlockController>();
-            //Debug.Log("HOVER " + block.name + " " + block.X + "/" + block.Y);
-            if (Input.GetMouseButtonDown(0)) // ADD TO QUEUE
+            block = hit.collider.GetComponent<BlockController>();
+        }
+        return block;
+    }
+
+    private void handleMouse()
+    {
+        if (Input.GetMouseButtonDown(0)) // LEFT CLICK
+        {
+            BlockController block = getPointedBlock();
+            if (block != null)
+            {
                 if (_selectedTiles.FirstOrDefault(x => x == block) == null && _pEnt.MP_Current > 0)
                 {
                     BlockController nearest = _selectedTiles.Count == 0 ? this.GetComponentInParent<BlockController>() : _selectedTiles[_selectedTiles.Count - 1];
@@ -68,7 +78,12 @@ public class PlayerGameUIController : MonoBehaviour
                         _selectedTiles.Add(block);
                     }
                 }
-            if (Input.GetMouseButtonDown(1)) // REMOVE FROM QUEUE
+            }
+        }
+        if (Input.GetMouseButtonDown(1)) // RIGHT CLICK
+        {
+            BlockController block = getPointedBlock();
+            if (block != null)
             {
                 int index;
                 if ((index = _selectedTiles.FindIndex(x => x == block)) != -1)
