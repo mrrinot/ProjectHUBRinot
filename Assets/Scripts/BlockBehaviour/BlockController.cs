@@ -11,6 +11,7 @@ public class BlockController : MonoBehaviour
     private Dictionary<e_Player, bool> _walkable;
     private Dictionary<e_Player, bool> _visible;
     private Dictionary<e_Player, float> _heuristics;
+    private List<ActionManager.e_Action> _potentialActions;
     private SpriteRenderer _rend;
     private float _lightBlock;
     private float _alpha;
@@ -22,6 +23,7 @@ public class BlockController : MonoBehaviour
         _walkable = new Dictionary<e_Player, bool>();
         _visible = new Dictionary<e_Player, bool>();
         _heuristics = new Dictionary<e_Player, float>();
+        _potentialActions = new List<ActionManager.e_Action>();
         foreach (e_Player id in System.Enum.GetValues(typeof(e_Player)))
         {
             _walkable[id] = true;
@@ -49,6 +51,25 @@ public class BlockController : MonoBehaviour
     public bool HasObject(e_Object obj)
     {
         return _objectlist.Exists(x => x == obj);
+    }
+
+    #endregion
+
+    #region Actions
+
+    public void AddPotentialAction(ActionManager.e_Action act)
+    {
+        _potentialActions.Add(act);
+    }
+
+    public void RemovePotentialAction(ActionManager.e_Action act)
+    {
+        _potentialActions.Remove(act);
+    }
+
+    public List<ActionManager.e_Action> GetPotentialActions()
+    {
+        return _potentialActions;
     }
 
     #endregion
@@ -91,6 +112,17 @@ public class BlockController : MonoBehaviour
     public void SetVisible(e_Player playerId, bool vis)
     {
         _visible[playerId] = vis;
+    }
+
+    public void SetWalkableAll(bool walk)
+    {
+        foreach (e_Player val in System.Enum.GetValues(typeof(e_Player)))
+            _walkable[val] = walk;
+    }
+    public void SetVisibleAll(bool vis)
+    {
+        foreach (e_Player val in System.Enum.GetValues(typeof(e_Player)))
+            _visible[val] =  vis;
     }
 
     public void SetHeuristic(e_Player playerId, float heur)

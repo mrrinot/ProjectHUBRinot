@@ -47,6 +47,8 @@ public class IObject : MonoBehaviour
         _bCtrl.RemoveObject(_type);
     }
 
+    protected abstract
+
     void HideObject(float alpha)
     {
         if (alpha >=_minAlpha)

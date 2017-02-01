@@ -7,6 +7,21 @@ public class ActionManager : MonoBehaviour
     private LightingManager _lightingManager;
     private MapHolder _map;
 
+    public enum e_Action : byte
+    {
+        NONE = 0,
+        ARM_TRAP,
+        DISARM_TRAP,
+        PICKUP_TRAP,
+        LIT_TORCH,
+        UNLIT_TORCH,
+        OPEN_CHEST,
+        USE_EXIT,
+        ARM_PALLET,
+        DESTROY_PALLET,
+        DAMAGE_PLAYER
+    };
+
     void Start()
     {
         _map = GameObject.Find("MapGenerator").GetComponent<MapGenerator>().GetMap();

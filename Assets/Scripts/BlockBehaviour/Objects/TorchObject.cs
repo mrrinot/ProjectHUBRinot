@@ -8,9 +8,6 @@ public class TorchObject : IObject
     protected override void Awake()
     {
         base.Awake();
-    }
-
-    void Start()
-    {
+        _bCtrl.SetWalkableAll(false);
     }
 }

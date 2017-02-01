@@ -8,9 +8,6 @@ public class PlayerObject : IObject
     protected override void Awake()
     {
         base.Awake();
-    }
-
-    void Start()
-    {
+        _bCtrl.AddPotentialAction(ActionManager.e_Action.DAMAGE_PLAYER);
     }
 }

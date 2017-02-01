@@ -10,8 +10,7 @@ public class WallObject : IObject
 	protected override void Awake ()
     {
         base.Awake();
-        foreach (e_Player val in System.Enum.GetValues(typeof(e_Player)))
-            _bCtrl.SetWalkable(val, false);
+        _bCtrl.SetWalkableAll(false);
         _bCtrl.SetLightBlock(1f);
 	}
 }
