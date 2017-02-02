@@ -38,8 +38,28 @@ public class IObject : MonoBehaviour
         _sprite = GetComponent<SpriteRenderer>();
         OnAlphaChanged += HideObject;
         _bCtrl = GetComponentInParent<BlockController>();
-        _bCtrl.SetLightBlock(_reducedAlpha);
+        OnBlockAdd();
+    }
+
+    protected virtual void OnBlockAdd()
+    {
+        _bCtrl.AddLightBlock(_reducedAlpha);
         _bCtrl.AddObject(_type);
+    }
+
+    protected virtual void OnBlockRemove()
+    {
+        _bCtrl.AddLightBlock(_reducedAlpha * -1f);
+        _bCtrl.RemoveObject(_type);
+    }
+
+    public virtual void ChangeBlock(BlockController newBlock)
+    {
+        OnBlockRemove();
+        _bCtrl = newBlock;
+        this.transform.SetParent(newBlock.transform);
+        this.transform.localPosition = Vector3.zero;
+        OnBlockAdd();
     }
 
     protected virtual void OnDestroy()

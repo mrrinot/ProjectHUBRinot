@@ -11,6 +11,7 @@ public class BlockController : MonoBehaviour
     private Dictionary<e_Player, bool> _walkable;
     private Dictionary<e_Player, bool> _visible;
     private Dictionary<e_Player, float> _heuristics;
+    private Dictionary<e_Player, List<ActionManager.e_Action>> _potentialActions;
     private SpriteRenderer _rend;
     private float _lightBlock;
     private float _alpha;
@@ -22,10 +23,12 @@ public class BlockController : MonoBehaviour
         _walkable = new Dictionary<e_Player, bool>();
         _visible = new Dictionary<e_Player, bool>();
         _heuristics = new Dictionary<e_Player, float>();
+        _potentialActions = new Dictionary<e_Player, List<ActionManager.e_Action>>();
         foreach (e_Player id in System.Enum.GetValues(typeof(e_Player)))
         {
             _walkable[id] = true;
             _visible[id] = false;
+            _potentialActions[id] = new List<ActionManager.e_Action>();
             _heuristics[id] = 0;
         }
         _posX = (int)transform.position.x;
@@ -49,6 +52,36 @@ public class BlockController : MonoBehaviour
     public bool HasObject(e_Object obj)
     {
         return _objectlist.Exists(x => x == obj);
+    }
+
+    #endregion
+
+    #region Actions
+
+    public void AddPotentialAction(e_Player pid, ActionManager.e_Action act)
+    {
+        _potentialActions[pid].Add(act);
+    }
+
+    public void RemovePotentialAction(e_Player pid, ActionManager.e_Action act)
+    {
+        _potentialActions[pid].Remove(act);
+    }
+    public void AddPotentialActionAll(ActionManager.e_Action act)
+    {
+        foreach (e_Player val in System.Enum.GetValues(typeof(e_Player)))
+            _potentialActions[val].Add(act);
+    }
+
+    public void RemovePotentialActionAll(ActionManager.e_Action act)
+    {
+        foreach (e_Player val in System.Enum.GetValues(typeof(e_Player)))
+            _potentialActions[val].Remove(act);
+    }
+
+    public List<ActionManager.e_Action> GetPotentialActionsForPlayer(e_Player pid)
+    {
+        return _potentialActions[pid];
     }
 
     #endregion
@@ -93,6 +126,17 @@ public class BlockController : MonoBehaviour
         _visible[playerId] = vis;
     }
 
+    public void SetWalkableAll(bool walk)
+    {
+        foreach (e_Player val in System.Enum.GetValues(typeof(e_Player)))
+            _walkable[val] = walk;
+    }
+    public void SetVisibleAll(bool vis)
+    {
+        foreach (e_Player val in System.Enum.GetValues(typeof(e_Player)))
+            _visible[val] =  vis;
+    }
+
     public void SetHeuristic(e_Player playerId, float heur)
     {
         _heuristics[playerId] = heur;
@@ -102,9 +146,9 @@ public class BlockController : MonoBehaviour
 
     #region vision
 
-    public void SetLightBlock(float block)
+    public void AddLightBlock(float block)
     {
-        _lightBlock = block;
+        _lightBlock =+ block;
     }
 
     public float GetLightBlock()

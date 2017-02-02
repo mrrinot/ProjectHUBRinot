@@ -9,8 +9,15 @@ public class PlayerObject : IObject
     {
         base.Awake();
     }
-
-    void Start()
+    protected override void OnBlockAdd()
     {
+        base.OnBlockAdd();
+        _bCtrl.AddPotentialActionAll(ActionManager.e_Action.DAMAGE_PLAYER);
+    }
+
+    protected override void OnBlockRemove()
+    {
+        base.OnBlockRemove();
+        _bCtrl.RemovePotentialActionAll(ActionManager.e_Action.DAMAGE_PLAYER);
     }
 }
