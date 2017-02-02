@@ -8,6 +8,7 @@ public class TorchObject : IObject
     protected override void Awake()
     {
         base.Awake();
+        _bCtrl.SetWalkable(e_Player.PLAYER, false);
     }
 
     void Start()
