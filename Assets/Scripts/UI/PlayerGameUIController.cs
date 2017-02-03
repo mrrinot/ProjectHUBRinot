@@ -142,12 +142,13 @@ public class PlayerGameUIController : MonoBehaviour
 
     private IEnumerator Moveto()
     {
+        _isTurn = false;
         int count = _selectedTiles.Count;
         bool moving = true;
         _hasMoved = true;
+        _pEnt.MP_Current = count;
         for (int i = 0; i < count; ++i)
         {
-            _pEnt.MP_Current++;
             if (moving)
                 moving = _actManager.RequestAction(ActionManager.e_Action.MOVE, _pEnt, _selectedTiles[0].transform.position);
             _selectedTiles.RemoveAt(0);
@@ -156,6 +157,7 @@ public class PlayerGameUIController : MonoBehaviour
             if (i + 1 < count)
                 yield return new WaitForSeconds(0.35f);
         }
+        _isTurn = true;
         EndTurnButtonText.text = "End turn";
     }
 
@@ -169,7 +171,7 @@ public class PlayerGameUIController : MonoBehaviour
             {
                 _isTurn = false;
                 _hasMoved = false;
-                if (_action != ActionManager.e_Action.NONE)
+                if (_action != ActionManager.e_Action.NONE) 
                 {
                     _actManager.RequestAction(_action, _pEnt, _outlineList[0].transform.position);
                 }

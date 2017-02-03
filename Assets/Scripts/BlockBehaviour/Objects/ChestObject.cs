@@ -13,13 +13,13 @@ public class ChestObject : IObject
 
     protected override void OnBlockAdd()
     {
-        base.OnBlockAdd();
         _bCtrl.AddPotentialAction(e_Player.PLAYER, ActionManager.e_Action.OPEN_CHEST);
+        base.OnBlockAdd(); // MUST BE LAST DUE TO CALLBACK IN CONTROLLER
     }
 
     protected override void OnBlockRemove()
     {
-        base.OnBlockRemove();
         _bCtrl.RemovePotentialAction(e_Player.PLAYER, ActionManager.e_Action.OPEN_CHEST);
+        base.OnBlockRemove(); // MUST BE LAST DUE TO CALLBACK IN CONTROLLER
     }
 }

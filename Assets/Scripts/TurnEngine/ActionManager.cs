@@ -33,6 +33,8 @@ public class ActionManager : MonoBehaviour
         _actionMap[e_Action.MOVE] = move;
         _actionMap[e_Action.UNLIT_TORCH] = unlitTorch;
         _actionMap[e_Action.LIT_TORCH] = litTorch;
+        _actionMap[e_Action.DISARM_TRAP] = disarmTrap;
+        _actionMap[e_Action.ARM_TRAP] = armTrap;
     }
 
     public bool RequestAction(ActionManager.e_Action act, ControllableEntity ent, Vector3 targetPos)
@@ -41,6 +43,29 @@ public class ActionManager : MonoBehaviour
             return _actionMap[act](ent, targetPos);
         else
             Debug.LogError("ACTION " + act + " NOT FOUND");
+        return false;
+    }
+
+    private bool disarmTrap(ControllableEntity ent, Vector3 trapPos)
+    {
+        BlockController block = _map.GetBlock((int)trapPos.x, (int)trapPos.y);
+        TrapObject trap = block.GetComponentInChildren<TrapObject>();
+        if (trap != null)
+        {
+            trap.ArmTrap();
+            _lightingManager.UpdateLighting();
+        }
+        return false;
+    }
+    private bool armTrap(ControllableEntity ent, Vector3 trapPos)
+    {
+        BlockController block = _map.GetBlock((int)trapPos.x, (int)trapPos.y);
+        TrapObject trap = block.GetComponentInChildren<TrapObject>();
+        if (trap != null)
+        {
+            trap.ArmTrap();
+            _lightingManager.UpdateLighting();
+        }
         return false;
     }
 

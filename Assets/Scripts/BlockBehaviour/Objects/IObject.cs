@@ -44,13 +44,13 @@ public class IObject : MonoBehaviour
     protected virtual void OnBlockAdd()
     {
         _bCtrl.AddLightBlock(_reducedAlpha);
-        _bCtrl.AddObject(_type);
+        _bCtrl.AddObject(_type); // MUST BE LAST DUE TO CALLBACK IN CONTROLLER
     }
 
     protected virtual void OnBlockRemove()
     {
         _bCtrl.AddLightBlock(_reducedAlpha * -1f);
-        _bCtrl.RemoveObject(_type);
+        _bCtrl.RemoveObject(_type); // MUST BE LAST DUE TO CALLBACK IN CONTROLLER
     }
 
     public virtual void ChangeBlock(BlockController newBlock)

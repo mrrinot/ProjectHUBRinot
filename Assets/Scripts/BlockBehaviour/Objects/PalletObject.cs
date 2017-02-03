@@ -11,25 +11,35 @@ public class PalletObject : IObject
     }
 
     private ActionManager.e_Action _potAct = ActionManager.e_Action.ARM_PALLET;
-    private e_PalletState _state;
+    private e_PalletState _state = e_PalletState.UNUSED;
 
-    protected override void Awake()
+    public void DestroyPallet()
     {
-        base.Awake();
-        _state = e_PalletState.UNUSED;
+        _state = e_PalletState.DESTROYED;
+        _bCtrl.SetWalkableAll(true);
+        _bCtrl.RemovePotentialActionAll(ActionManager.e_Action.DESTROY_PALLET);
+    }
+
+    public void BlockPallet()
+    {
+        _state = e_PalletState.BLOCK;
+        _bCtrl.RemovePotentialAction(e_Player.PLAYER, _potAct);
+        _potAct = ActionManager.e_Action.DESTROY_PALLET;
+        _bCtrl.AddPotentialActionAll(_potAct);
+        _bCtrl.RemovePotentialAction(e_Player.PLAYER, _potAct);
     }
 
     protected override void OnBlockAdd()
     {
-        base.OnBlockAdd();
         _bCtrl.AddPotentialAction(e_Player.PLAYER, _potAct);
+        base.OnBlockAdd(); // MUST BE LAST DUE TO CALLBACK IN CONTROLLER
     }
     protected override void OnBlockRemove()
     {
-        base.OnBlockRemove();
         if (_state == e_PalletState.UNUSED)
             _bCtrl.RemovePotentialAction(e_Player.PLAYER, _potAct);
         else if (_state == e_PalletState.BLOCK)
             _bCtrl.RemovePotentialActionAll(_potAct);
+        base.OnBlockRemove(); // MUST BE LAST DUE TO CALLBACK IN CONTROLLER
     }
 }

@@ -3,8 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
+public delegate void Void_D_Void();
+
 public class BlockController : MonoBehaviour
 {
+    
     private List<e_Object> _objectlist;
     private int _posX;
     private int _posY;
@@ -15,6 +18,9 @@ public class BlockController : MonoBehaviour
     private SpriteRenderer _rend;
     private float _lightBlock;
     private float _alpha;
+
+    public event Void_D_Void OnObjectAdded;
+    public event Void_D_Void OnObjectRemoved;
 
 	void Awake()
     {
@@ -42,11 +48,15 @@ public class BlockController : MonoBehaviour
     public void AddObject(e_Object obj)
     {
         _objectlist.Add(obj);
+        if (OnObjectAdded != null)
+            OnObjectAdded();
     }
 
     public void RemoveObject(e_Object obj)
     {
         _objectlist.Remove(obj);
+        if (OnObjectRemoved != null)
+            OnObjectRemoved();
     }
 
     public bool HasObject(e_Object obj)

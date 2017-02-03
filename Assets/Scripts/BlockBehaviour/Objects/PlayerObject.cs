@@ -11,13 +11,13 @@ public class PlayerObject : IObject
     }
     protected override void OnBlockAdd()
     {
-        base.OnBlockAdd();
         _bCtrl.AddPotentialActionAll(ActionManager.e_Action.DAMAGE_PLAYER);
+        base.OnBlockAdd(); // MUST BE LAST DUE TO CALLBACK IN CONTROLLER
     }
 
     protected override void OnBlockRemove()
     {
-        base.OnBlockRemove();
         _bCtrl.RemovePotentialActionAll(ActionManager.e_Action.DAMAGE_PLAYER);
+        base.OnBlockRemove(); // MUST BE LAST DUE TO CALLBACK IN CONTROLLER
     }
 }
