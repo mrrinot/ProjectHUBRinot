@@ -5,11 +5,15 @@ public class TrapObject : IObject
 {
     private bool _isArmed = true;
     private ActionManager.e_Action _potAct = ActionManager.e_Action.DISARM_TRAP;
+    private Sprite _armedTrap;
+    private Sprite _disarmedTrap;
 
     protected override void Awake()
     {
         base.Awake();
         _bCtrl.OnObjectAdded += DetectPlayers;
+        _armedTrap = Resources.Load("Trap", typeof(Sprite)) as Sprite;
+        _disarmedTrap = Resources.Load("Trap_2", typeof(Sprite)) as Sprite;
     }
     public void ArmTrap()
     {
@@ -18,7 +22,7 @@ public class TrapObject : IObject
         {
             _bCtrl.RemovePotentialAction(e_Player.PLAYER, _potAct);
             _potAct = ActionManager.e_Action.DISARM_TRAP;
-            _sprite.color = Color.white;
+            _sprite.sprite = _armedTrap;
             _bCtrl.OnObjectAdded += DetectPlayers;
             _bCtrl.AddPotentialAction(e_Player.PLAYER, _potAct);
         }
@@ -26,7 +30,7 @@ public class TrapObject : IObject
         {
             _bCtrl.RemovePotentialAction(e_Player.PLAYER, _potAct);
             _potAct = ActionManager.e_Action.ARM_TRAP;
-            _sprite.color = new Color(0.5f, 0.5f, 0.5f);
+            _sprite.sprite = _disarmedTrap;
             _bCtrl.OnObjectAdded -= DetectPlayers;
             _bCtrl.AddPotentialAction(e_Player.PLAYER, _potAct);
         }

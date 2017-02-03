@@ -7,9 +7,14 @@ public class TorchObject : IObject
     private bool _isLit = true;
     private ActionManager.e_Action _potAct = ActionManager.e_Action.UNLIT_TORCH;
     private LightingSource _source;
+    private Sprite _litTorchSprite;
+    private Sprite _unlitTorchSprite;
+
     protected override void Awake()
     {
         base.Awake();
+        _litTorchSprite = Resources.Load("Torch", typeof(Sprite)) as Sprite;
+        _unlitTorchSprite = Resources.Load("Torch_2", typeof(Sprite)) as Sprite;
         _source = GetComponent<LightingSource>();
         _bCtrl.SetWalkableAll(false);
     }
@@ -20,14 +25,14 @@ public class TorchObject : IObject
         _source.IsLit = _isLit;
         if (_isLit == true)
         {
-            _sprite.color = Color.white; // TODO CHANGE SPRITE INSTEAD OF COLOR
+            _sprite.sprite = _litTorchSprite;
             _bCtrl.RemovePotentialAction(e_Player.PLAYER, _potAct);
             _potAct = ActionManager.e_Action.UNLIT_TORCH;
             _bCtrl.AddPotentialAction(e_Player.PLAYER, _potAct);
         }
         else
         {
-            _sprite.color = Color.black;
+            _sprite.sprite = _unlitTorchSprite;
             _bCtrl.RemovePotentialAction(e_Player.PLAYER, _potAct);
             _potAct = ActionManager.e_Action.LIT_TORCH;
             _bCtrl.AddPotentialAction(e_Player.PLAYER, _potAct);

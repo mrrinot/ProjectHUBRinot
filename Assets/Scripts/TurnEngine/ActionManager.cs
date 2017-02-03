@@ -35,6 +35,8 @@ public class ActionManager : MonoBehaviour
         _actionMap[e_Action.LIT_TORCH] = litTorch;
         _actionMap[e_Action.DISARM_TRAP] = disarmTrap;
         _actionMap[e_Action.ARM_TRAP] = armTrap;
+        _actionMap[e_Action.ARM_PALLET] = armPallet;
+        _actionMap[e_Action.DESTROY_PALLET] = destroyPallet;
     }
 
     public bool RequestAction(ActionManager.e_Action act, ControllableEntity ent, Vector3 targetPos)
@@ -46,6 +48,31 @@ public class ActionManager : MonoBehaviour
         return false;
     }
 
+    private bool armPallet(ControllableEntity ent, Vector3 palletPos)
+    {
+        BlockController block = _map.GetBlock((int)palletPos.x, (int)palletPos.y);
+        PalletObject pallet = block.GetComponentInChildren<PalletObject>();
+        if (pallet != null)
+        {
+            pallet.BlockPallet();
+            //_lightingManager.UpdateLighting();
+            return true;
+        }
+        return false;
+    }
+    private bool destroyPallet(ControllableEntity ent, Vector3 palletPos)
+    {
+        BlockController block = _map.GetBlock((int)palletPos.x, (int)palletPos.y);
+        PalletObject pallet = block.GetComponentInChildren<PalletObject>();
+        if (pallet != null)
+        {
+            pallet.DestroyPallet();
+            //_lightingManager.UpdateLighting();
+            return true;
+        }
+        return false;
+    }
+
     private bool disarmTrap(ControllableEntity ent, Vector3 trapPos)
     {
         BlockController block = _map.GetBlock((int)trapPos.x, (int)trapPos.y);
@@ -54,6 +81,7 @@ public class ActionManager : MonoBehaviour
         {
             trap.ArmTrap();
             _lightingManager.UpdateLighting();
+            return true;
         }
         return false;
     }
@@ -65,6 +93,7 @@ public class ActionManager : MonoBehaviour
         {
             trap.ArmTrap();
             _lightingManager.UpdateLighting();
+            return true;
         }
         return false;
     }
@@ -77,6 +106,7 @@ public class ActionManager : MonoBehaviour
         {
             torch.LitTorch();
             _lightingManager.UpdateLighting();
+            return true;
         }
         return false;
     }
@@ -88,6 +118,7 @@ public class ActionManager : MonoBehaviour
         {
             torch.LitTorch();
             _lightingManager.UpdateLighting();
+            return true;
         }
         return false;
     }

@@ -80,7 +80,6 @@ public class PatternListController : MonoBehaviour {
             updateOldName(oldName, data.name);
             File.Delete(PatternInfos.DESCRIPTOR_PATH + oldName + ".xml");
         }
-        Debug.Log("UPDATE " + data.name);
         System.Xml.Serialization.XmlSerializer writer = new System.Xml.Serialization.XmlSerializer(typeof(PatternDescriptorData));
         FileStream fs = new FileStream(PatternInfos.DESCRIPTOR_PATH + data.name + ".xml", FileMode.Create);
         writer.Serialize(fs, data);
@@ -124,7 +123,7 @@ public class PatternListController : MonoBehaviour {
         {
             GameObject fileObj = Instantiate(filePrefab, Vector3.zero, Quaternion.identity) as GameObject;
             _prefabsList.Add(fileObj);
-            fileObj.transform.parent = _rectTransform;
+            fileObj.transform.SetParent(_rectTransform);
             fileObj.transform.localScale = new Vector3(1, 1, 1);
             fileObj.GetComponent<Text>().text = file;
         }

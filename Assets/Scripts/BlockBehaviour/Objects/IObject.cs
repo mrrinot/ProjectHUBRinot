@@ -62,11 +62,6 @@ public class IObject : MonoBehaviour
         OnBlockAdd();
     }
 
-    protected virtual void OnDestroy()
-    {
-        _bCtrl.RemoveObject(_type);
-    }
-
     void HideObject(float alpha)
     {
         if (alpha >=_minAlpha)

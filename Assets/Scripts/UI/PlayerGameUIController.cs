@@ -108,6 +108,7 @@ public class PlayerGameUIController : MonoBehaviour
                         GameObject.Destroy(_outlineList[0]);
                         _outlineList.Clear();
                         EndTurnButtonText.text = "End Turn";
+                        _action = ActionManager.e_Action.NONE;
                     }
                     if (actList.Count > 0)
                     {
