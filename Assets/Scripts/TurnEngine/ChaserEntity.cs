@@ -1,15 +1,14 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class EntityAI : MonoBehaviour {
+public class ChaserEntity : ControllableEntity
+{
+    public override void OnTurnStart()
+    {
+        base.OnTurnStart();
+    }
 
-	// Use this for initialization
-	void Start () {
-	
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
+    public override void OnHit()
+    {
+    }
 }

@@ -7,6 +7,7 @@ public class ActionManager : MonoBehaviour
     public delegate bool Bool_D_CEnt_V3(ControllableEntity ent, Vector3 tPos);
 
     private LightingManager _lightingManager;
+    private SoundManager _soundManager;
     private MapHolder _map;
     private Dictionary<e_Action, Bool_D_CEnt_V3> _actionMap = new Dictionary<e_Action,Bool_D_CEnt_V3>();
 
@@ -30,6 +31,7 @@ public class ActionManager : MonoBehaviour
     {
         _map = GameObject.Find("MapGenerator").GetComponent<MapGenerator>().GetMap();
         _lightingManager = GetComponent<LightingManager>();
+        _soundManager = GetComponent<SoundManager>();
         _actionMap[e_Action.MOVE] = move;
         _actionMap[e_Action.UNLIT_TORCH] = unlitTorch;
         _actionMap[e_Action.LIT_TORCH] = litTorch;
@@ -105,6 +107,7 @@ public class ActionManager : MonoBehaviour
         if (torch != null)
         {
             torch.LitTorch();
+            _soundManager.ProduceSound(block, 5f);
             _lightingManager.UpdateLighting();
             return true;
         }
@@ -117,6 +120,7 @@ public class ActionManager : MonoBehaviour
         if (torch != null)
         {
             torch.LitTorch();
+            _soundManager.ProduceSound(block, 5f);
             _lightingManager.UpdateLighting();
             return true;
         }

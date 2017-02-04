@@ -24,13 +24,16 @@ public class TrapObject : IObject
             _potAct = ActionManager.e_Action.DISARM_TRAP;
             _sprite.sprite = _armedTrap;
             _bCtrl.OnObjectAdded += DetectPlayers;
+            _minAlpha = 0.95f;
             _bCtrl.AddPotentialAction(e_Player.PLAYER, _potAct);
+
         }
         else
         {
             _bCtrl.RemovePotentialAction(e_Player.PLAYER, _potAct);
             _potAct = ActionManager.e_Action.ARM_TRAP;
             _sprite.sprite = _disarmedTrap;
+            _minAlpha = 0.5f;
             _bCtrl.OnObjectAdded -= DetectPlayers;
             _bCtrl.AddPotentialAction(e_Player.PLAYER, _potAct);
         }

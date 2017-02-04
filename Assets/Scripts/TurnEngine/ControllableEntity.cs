@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+public delegate void Void_D_CEnt_Block_Float(ControllableEntity ent, BlockController block, float soundpower);
+
 public abstract class ControllableEntity : MonoBehaviour
 {
     [SerializeField]
@@ -13,6 +15,7 @@ public abstract class ControllableEntity : MonoBehaviour
 
     public event Void_D_Float OnHPChanged;
     public event Void_D_Float OnMPChanged;
+    public event Void_D_CEnt_Block_Float OnSoundHeard;
 
     [SerializeField]
     protected int _visionRange;
@@ -32,7 +35,7 @@ public abstract class ControllableEntity : MonoBehaviour
     protected virtual void Awake()
     {
         _tManager= GameObject.Find("TurnManager").GetComponent<TurnManager>();
-        _actManager = GameObject.Find("TurnManager").GetComponent<ActionManager>();
+        _actManager = _tManager.gameObject.GetComponent<ActionManager>();
         _mpCurrent = _mpMax;
         _hpCurrent = _hpMax;
     }
@@ -93,6 +96,17 @@ public abstract class ControllableEntity : MonoBehaviour
             if (_mpMax < MP_Current)
                 MP_Current = _mpMax;
         }
+    }
+
+    public virtual int HearingRange
+    {
+        get { return _hearingRange; }
+    }
+
+    public void SoundHeard(ControllableEntity ent, BlockController from, float power)
+    {
+        if (OnSoundHeard != null)
+            OnSoundHeard(ent, from, power);
     }
 
 }
