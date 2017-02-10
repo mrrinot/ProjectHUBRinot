@@ -10,7 +10,6 @@ public class PlayerEntity : ControllableEntity
     {
         base.Awake();
         _uiController = GetComponent<PlayerGameUIController>();
-        _tManager.AddPlayer(this);
     }
     
     public void OnEndTurn()

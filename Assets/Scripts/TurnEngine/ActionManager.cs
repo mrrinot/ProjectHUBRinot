@@ -107,7 +107,7 @@ public class ActionManager : MonoBehaviour
         if (torch != null)
         {
             torch.LitTorch();
-            _soundManager.ProduceSound(block, 5f);
+            _soundManager.ProduceSound(ent, block, 5f);
             _lightingManager.UpdateLighting();
             return true;
         }
@@ -120,7 +120,7 @@ public class ActionManager : MonoBehaviour
         if (torch != null)
         {
             torch.LitTorch();
-            _soundManager.ProduceSound(block, 5f);
+            _soundManager.ProduceSound(ent, block, 5f);
             _lightingManager.UpdateLighting();
             return true;
         }

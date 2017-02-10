@@ -7,7 +7,7 @@ public enum e_Player : byte
     PLAYER = 0,
     CHASER,
     SENTINEL,
-    TRAPER
+    TRAPPER
 }
 
 public class TurnManager : MonoBehaviour
@@ -23,6 +23,11 @@ public class TurnManager : MonoBehaviour
     public void AddPlayer(ControllableEntity ent)
     {
         _players.Add(ent);
+    }
+
+    public List<ControllableEntity> GetAllEntities()
+    {
+        return _players;
     }
 
     public void EndTurn(ControllableEntity ent)

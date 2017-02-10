@@ -35,6 +35,7 @@ public abstract class ControllableEntity : MonoBehaviour
     protected virtual void Awake()
     {
         _tManager= GameObject.Find("TurnManager").GetComponent<TurnManager>();
+        _tManager.AddPlayer(this);
         _actManager = _tManager.gameObject.GetComponent<ActionManager>();
         _mpCurrent = _mpMax;
         _hpCurrent = _hpMax;

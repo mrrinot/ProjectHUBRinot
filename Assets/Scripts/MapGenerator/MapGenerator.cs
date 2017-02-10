@@ -79,6 +79,19 @@ public class MapHolder
                 GameObject.Destroy(_map[i][j].gameObject);
     }
 
+    public List<BlockController> GetAllBlockWithinDistanceOf(BlockController center, int distance)
+    {
+        List<BlockController> results = new List<BlockController>();
+        for (int i = 0; i < _maxX - _minX; ++i)
+            for (int j = 0; j < _maxY - _minY; ++j)
+            {
+                BlockController block = _map[i][j];
+                if (block != null && (int)Vector2.Distance(block.transform.position, center.transform.position) == distance)
+                    results.Add(block);
+            }
+        return results;
+    }
+
     public List<BlockController> GetAllBlocksWith(List<e_Object> include)
     {
         List<BlockController> results = new List<BlockController>();
@@ -140,6 +153,7 @@ public class MapGenerator : MonoBehaviour
     };
 
     private Dictionary<ePatternType, List<PatternDescriptorData>> _patterns = new Dictionary<ePatternType, List<PatternDescriptorData>>();
+    private Dictionary<e_Player, GameObject> _ennemyEnumToName = new Dictionary<e_Player, GameObject>();
     private Dictionary<ePatternType, int> _totalPatternsRarity = new Dictionary<ePatternType, int>();
     private Dictionary<eTile, GameObject> _tilePrefabsDict = new Dictionary<eTile, GameObject>();
     private MapHolder _map = null;
@@ -149,9 +163,8 @@ public class MapGenerator : MonoBehaviour
     void Awake()
     {
         loadPatterns();
-        loadTilePrefabs();
-        CreateMap(50);
-        InstantiateMap();
+        loadPrefabs();
+        CreateMap(50, new List<e_Player>() {e_Player.CHASER});
     }
 
     #region Utility
@@ -188,10 +201,13 @@ public class MapGenerator : MonoBehaviour
         }
     }
 
-    void loadTilePrefabs()
+    void loadPrefabs()
     {
         foreach (eTile tileEnum in System.Enum.GetValues(typeof(eTile)))
             _tilePrefabsDict[tileEnum] = Resources.Load(BLOCK_PATH + PatternInfos.tileToString[tileEnum] + "Block", typeof(GameObject)) as GameObject;
+        _ennemyEnumToName[e_Player.CHASER] = Resources.Load("Objects/ChaserObject", typeof(GameObject)) as GameObject;
+        _ennemyEnumToName[e_Player.SENTINEL] = Resources.Load("Objects/SentinelObject", typeof(GameObject)) as GameObject;
+        _ennemyEnumToName[e_Player.TRAPPER] = Resources.Load("Objects/TrapperObject", typeof(GameObject)) as GameObject;
     }
 
     void resetPatterns()
@@ -366,7 +382,7 @@ public class MapGenerator : MonoBehaviour
         addNearbyTiles(chosen);
     }
 
-    public void CreateMap(int patternNumber)
+    public void CreateMap(int patternNumber, List<e_Player> ennemyList)
     {
         MapPattern addedPattern = new MapPattern(0, 0, null);
         ePatternType tileType;
@@ -382,9 +398,10 @@ public class MapGenerator : MonoBehaviour
             setPatternOfType(tileType);
         }
         setPatternOfType(ePatternType.END);
+        InstantiateMap(patternNumber, ennemyList);
     }
 
-    void InstantiateMap()
+    void InstantiateMap(int patternNumber, List<e_Player> ennemyList)
     {
         int maxX = 0, maxY = 0, minX = 0, minY = 0;
         List<BlockController> blockList = new List<BlockController>();
@@ -451,17 +468,16 @@ public class MapGenerator : MonoBehaviour
         minY--;
         maxY += 2;
         _map = new MapHolder(minX * 5, maxX * 5, minY * 5, maxY * 5, blockList);
-        adjustMap();
+        adjustMap(patternNumber, ennemyList);
 
     }
 
-    void adjustMap()
+    void adjustMap(int patternNumber, List<e_Player> ennemyList)
     {
         List<BlockController> pallets = _map.GetAllBlocksWith(new List<e_Object>() { e_Object.PALLET });
 
         foreach (BlockController palletblock in pallets)
         {
-
             int unwalkableCount = 0;
             if (_map.GetBlock(palletblock.X + 1, palletblock.Y).IsWalkable(e_Player.PLAYER) == false)
                 unwalkableCount++;
@@ -474,8 +490,32 @@ public class MapGenerator : MonoBehaviour
             if (unwalkableCount >= 3)
                 GameObject.Destroy(palletblock.GetComponentInChildren<PalletObject>().gameObject);
         }
+        BlockController startBlock = _map.GetAllBlocksWith(new List<e_Object>() { e_Object.START })[0];
+        if (ennemyList != null)
+        {
+            foreach (e_Player ennemy in ennemyList)
+            {
+                int cpt = 9;
+                bool found = false;
+                while (cpt > 0 && found == false)
+                {
+                    List<BlockController> lineBlocks = _map.GetAllBlockWithinDistanceOf(startBlock, cpt);
+                    foreach (BlockController block in lineBlocks)
+                    {
+                        if (block.IsWalkable(ennemy) && block.HasObject(e_Object.TRAP) == false && block.HasObject(e_Object.KILLER) == false)
+                        {
+                            GameObject ennemyGO = GameObject.Instantiate(_ennemyEnumToName[ennemy], block.transform);
+                            ennemyGO.transform.localPosition = Vector3.zero;
+                            found = true;
+                            break;
+                        }
+                    }
+                    cpt--;
+                }
+            }
+        }
+
     }
 
     #endregion
-
 }

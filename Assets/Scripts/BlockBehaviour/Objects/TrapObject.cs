@@ -53,14 +53,14 @@ public class TrapObject : IObject
     protected override void OnBlockAdd()
     {
         _bCtrl.AddPotentialAction(e_Player.PLAYER, _potAct);
-        _bCtrl.AddPotentialAction(e_Player.TRAPER, ActionManager.e_Action.PICKUP_TRAP);
+        _bCtrl.AddPotentialAction(e_Player.TRAPPER, ActionManager.e_Action.PICKUP_TRAP);
         base.OnBlockAdd(); // MUST BE LAST DUE TO CALLBACK IN CONTROLLER
     }
 
     protected override void OnBlockRemove()
     {
         _bCtrl.RemovePotentialAction(e_Player.PLAYER, _potAct);
-        _bCtrl.RemovePotentialAction(e_Player.TRAPER, ActionManager.e_Action.PICKUP_TRAP);
+        _bCtrl.RemovePotentialAction(e_Player.TRAPPER, ActionManager.e_Action.PICKUP_TRAP);
         base.OnBlockRemove(); // MUST BE LAST DUE TO CALLBACK IN CONTROLLER
     }
 }
