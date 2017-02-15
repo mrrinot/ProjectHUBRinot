@@ -22,8 +22,4 @@ public class PlayerEntity : ControllableEntity
         base.OnTurnStart();
         _uiController.OnStartTurn();
     }
-
-    public override void OnHit()
-    {
-    }
 }

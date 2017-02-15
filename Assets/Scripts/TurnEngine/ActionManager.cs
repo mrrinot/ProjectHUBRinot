@@ -6,10 +6,11 @@ public class ActionManager : MonoBehaviour
 {
     public delegate bool Bool_D_CEnt_V3(ControllableEntity ent, Vector3 tPos);
 
-    private LightingManager _lightingManager;
+    private VisionManager _lightingManager;
     private SoundManager _soundManager;
     private MapHolder _map;
     private Dictionary<e_Action, Bool_D_CEnt_V3> _actionMap = new Dictionary<e_Action,Bool_D_CEnt_V3>();
+    private int _stepSpeed = 0;
 
     public enum e_Action : byte
     {
@@ -30,7 +31,7 @@ public class ActionManager : MonoBehaviour
     void Start()
     {
         _map = GameObject.Find("MapGenerator").GetComponent<MapGenerator>().GetMap();
-        _lightingManager = GetComponent<LightingManager>();
+        _lightingManager = GetComponent<VisionManager>();
         _soundManager = GetComponent<SoundManager>();
         _actionMap[e_Action.MOVE] = move;
         _actionMap[e_Action.UNLIT_TORCH] = unlitTorch;
@@ -82,7 +83,7 @@ public class ActionManager : MonoBehaviour
         if (trap != null)
         {
             trap.ArmTrap();
-            _lightingManager.UpdateLighting();
+            _lightingManager.UpdateLightingAndVision();
             return true;
         }
         return false;
@@ -94,7 +95,7 @@ public class ActionManager : MonoBehaviour
         if (trap != null)
         {
             trap.ArmTrap();
-            _lightingManager.UpdateLighting();
+            _lightingManager.UpdateLightingAndVision();
             return true;
         }
         return false;
@@ -108,7 +109,7 @@ public class ActionManager : MonoBehaviour
         {
             torch.LitTorch();
             _soundManager.ProduceSound(ent, block, 5f);
-            _lightingManager.UpdateLighting();
+            _lightingManager.UpdateLightingAndVision();
             return true;
         }
         return false;
@@ -121,10 +122,15 @@ public class ActionManager : MonoBehaviour
         {
             torch.LitTorch();
             _soundManager.ProduceSound(ent, block, 5f);
-            _lightingManager.UpdateLighting();
+            _lightingManager.UpdateLightingAndVision();
             return true;
         }
         return false;
+    }
+
+    public void SetStepSpeed(int speed)
+    {
+        _stepSpeed = speed;
     }
 
     private bool move(ControllableEntity ent, Vector3 moveTo)
@@ -134,7 +140,8 @@ public class ActionManager : MonoBehaviour
         {
             ent.MP_Current--;
             ent.GetComponent<IObject>().ChangeBlock(dest);
-            _lightingManager.UpdateLighting();
+            _lightingManager.UpdateLightingAndVision();
+            _soundManager.ProduceSound(ent, dest, _stepSpeed);
             return true;
         }
         return false;

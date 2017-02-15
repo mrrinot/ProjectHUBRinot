@@ -53,7 +53,7 @@ public class IObject : MonoBehaviour
         _bCtrl.RemoveObject(_type); // MUST BE LAST DUE TO CALLBACK IN CONTROLLER
     }
 
-    public virtual void ChangeBlock(BlockController newBlock)
+    public void ChangeBlock(BlockController newBlock)
     {
         OnBlockRemove();
         _bCtrl = newBlock;

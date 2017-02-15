@@ -72,6 +72,21 @@ public class MapHolder
         return _map[x - _minX][y - _minY];
     }
 
+    public int GetMapWidth()
+    {
+        return _maxX - _minX;
+    }
+
+    public int GetMapHeight()
+    {
+        return _maxY - _minY;
+    }
+
+    public BlockController[][] GetRawMap()
+    {
+        return _map;
+    }
+
     public void EraseMap()
     {
         for (int i = 0; i < _maxX - _minX; ++i)
@@ -162,6 +177,9 @@ public class MapGenerator : MonoBehaviour
 
     void Awake()
     {
+        int seed = UnityEngine.Random.Range(int.MinValue, int.MaxValue - 1);
+        Debug.Log("SEED = " + seed);
+        UnityEngine.Random.InitState(seed);
         loadPatterns();
         loadPrefabs();
         CreateMap(50, new List<e_Player>() {e_Player.CHASER});

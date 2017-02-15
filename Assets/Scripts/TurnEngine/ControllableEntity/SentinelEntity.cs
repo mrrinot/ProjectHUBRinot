@@ -9,7 +9,4 @@ public class SentinelEntity : ControllableEntity
         base.OnTurnStart();
     }
 
-    public override void OnHit()
-    {
-    }
 }

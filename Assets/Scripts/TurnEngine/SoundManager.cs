@@ -19,16 +19,16 @@ public class SoundManager : MonoBehaviour
         { 
             if (ent != from)
             {
-                RaycastHit[] rayHits = Physics.RaycastAll(ent.transform.parent.position, srcVec, Vector3.Distance(ent.transform.parent.position, srcVec));
-                //Debug.DrawLine(ent.transform.parent.position, new Vector3(source.X, source.Y, source.transform.position.z), Color.red, 60.0f);
+                RaycastHit[] rayHits = Physics.RaycastAll(ent.transform.parent.position, srcVec - ent.transform.parent.position, Vector3.Distance(ent.transform.parent.position, srcVec));
+                //Debug.DrawRay(ent.transform.parent.position, srcVec - ent.transform.parent.position, Color.red, 10.0f);
                 float distSound = Vector3.Distance(ent.transform.parent.position, srcVec);
                 foreach (RaycastHit rayHit in rayHits)
                 {
                     BlockController block = rayHit.collider.GetComponent<BlockController>();
                     if (block.HasObject(e_Object.WALL))
-                        distSound--;
+                        distSound++;
                 }
-                if (distSound >= range + ent.HearingRange)
+                if (Mathf.Floor(distSound) <= range + ent.HearingRange)
                     ent.SoundHeard(from, source, distSound);
             }
         }

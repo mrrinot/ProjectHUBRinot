@@ -31,12 +31,14 @@ public abstract class ControllableEntity : MonoBehaviour
 
     protected TurnManager _tManager;
     protected ActionManager _actManager;
+    protected MapHolder _map;
     
     protected virtual void Awake()
     {
         _tManager= GameObject.Find("TurnManager").GetComponent<TurnManager>();
         _tManager.AddPlayer(this);
         _actManager = _tManager.gameObject.GetComponent<ActionManager>();
+        _map = GameObject.Find("MapGenerator").GetComponent<MapGenerator>().GetMap();
         _mpCurrent = _mpMax;
         _hpCurrent = _hpMax;
     }
@@ -45,8 +47,6 @@ public abstract class ControllableEntity : MonoBehaviour
     {
         MP_Current = MP_Max;
     }
-
-    public abstract void OnHit();
 
     public virtual e_Player PID
     {
@@ -99,6 +99,11 @@ public abstract class ControllableEntity : MonoBehaviour
         }
     }
 
+    public virtual int VisionRange
+    {
+        get { return _visionRange; }
+    }
+
     public virtual int HearingRange
     {
         get { return _hearingRange; }
@@ -109,5 +114,4 @@ public abstract class ControllableEntity : MonoBehaviour
         if (OnSoundHeard != null)
             OnSoundHeard(ent, from, power);
     }
-
 }

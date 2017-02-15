@@ -8,8 +8,4 @@ public class TrapperEntity : ControllableEntity
     {
         base.OnTurnStart();
     }
-
-    public override void OnHit()
-    {
-    }
 }

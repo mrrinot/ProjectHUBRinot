@@ -30,6 +30,17 @@ public class TurnManager : MonoBehaviour
         return _players;
     }
 
+    public List<ControllableEntity> GetAllEnnemies()
+    {
+        List<ControllableEntity> results = new List<ControllableEntity>();
+        foreach (ControllableEntity ent in _players)
+        {
+            if (ent.PID != e_Player.PLAYER)
+                results.Add(ent);
+        }
+        return results;
+    }
+
     public void EndTurn(ControllableEntity ent)
     {
         if (_players[_playingTurnIndex] == ent)

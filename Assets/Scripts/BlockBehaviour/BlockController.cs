@@ -126,6 +126,25 @@ public class BlockController : MonoBehaviour
 
     #region Setter
 
+    public void SetHeuristics(e_Player playerId, float val)
+    {
+        _heuristics[playerId] = val;
+    }
+    public void SetHeuristicsAll(float val)
+    {
+        foreach (e_Player playerId in System.Enum.GetValues(typeof(e_Player)))
+            _heuristics[playerId] = val;
+    }
+    public void AddHeuristics(e_Player playerId, float val)
+    {
+        _heuristics[playerId] += val;
+    }
+    public void AddHeuristicsAll(float val)
+    {
+        foreach (e_Player playerId in System.Enum.GetValues(typeof(e_Player)))
+            _heuristics[playerId] += val;
+    }
+
     public void SetWalkable(e_Player playerId, bool walk)
     {
         _walkable[playerId] = walk;
