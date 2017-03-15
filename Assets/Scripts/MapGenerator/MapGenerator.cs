@@ -518,8 +518,10 @@ public class MapGenerator : MonoBehaviour
                 while (cpt > 0 && found == false)
                 {
                     List<BlockController> lineBlocks = _map.GetAllBlockWithinDistanceOf(startBlock, cpt);
-                    foreach (BlockController block in lineBlocks)
+                    int rdn = 0;
+                    while (found == false && lineBlocks.Count > 0)
                     {
+                        BlockController block = lineBlocks[UnityEngine.Random.Range(0, lineBlocks.Count)];
                         if (block.IsWalkable(ennemy) && block.HasObject(e_Object.TRAP) == false && block.HasObject(e_Object.KILLER) == false)
                         {
                             GameObject ennemyGO = GameObject.Instantiate(_ennemyEnumToName[ennemy], block.transform);
@@ -527,6 +529,8 @@ public class MapGenerator : MonoBehaviour
                             found = true;
                             break;
                         }
+                        else
+                            lineBlocks.Remove(block);
                     }
                     cpt--;
                 }

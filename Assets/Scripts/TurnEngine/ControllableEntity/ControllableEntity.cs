@@ -2,6 +2,7 @@
 using System.Collections;
 
 public delegate void Void_D_CEnt_Block_Float(ControllableEntity ent, BlockController block, float soundpower);
+public delegate void Void_D_Block(BlockController block);
 
 public abstract class ControllableEntity : MonoBehaviour
 {
@@ -16,6 +17,7 @@ public abstract class ControllableEntity : MonoBehaviour
     public event Void_D_Float OnHPChanged;
     public event Void_D_Float OnMPChanged;
     public event Void_D_CEnt_Block_Float OnSoundHeard;
+    public event Void_D_Block OnBlockSeen;
 
     [SerializeField]
     protected int _visionRange;
@@ -113,5 +115,11 @@ public abstract class ControllableEntity : MonoBehaviour
     {
         if (OnSoundHeard != null)
             OnSoundHeard(ent, from, power);
+    }
+
+    public void BlockSeen(BlockController from)
+    {
+        if (OnBlockSeen != null)
+            OnBlockSeen(from);
     }
 }

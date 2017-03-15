@@ -7,41 +7,45 @@ public delegate void Void_D_Void();
 
 public class BlockController : MonoBehaviour
 {
-    
+
     private List<e_Object> _objectlist;
     private int _posX;
     private int _posY;
     private Dictionary<e_Player, bool> _walkable;
     private Dictionary<e_Player, bool> _visible;
     private Dictionary<e_Player, float> _heuristics;
+    private Dictionary<e_Player, float> _movementCost;
+    private Dictionary<e_Player, float> _alphas;
     private Dictionary<e_Player, List<ActionManager.e_Action>> _potentialActions;
     private SpriteRenderer _rend;
     private float _lightBlock;
-    private float _alpha;
 
     public event Void_D_Void OnObjectAdded;
     public event Void_D_Void OnObjectRemoved;
 
-	void Awake()
+    void Awake()
     {
         _rend = GetComponent<SpriteRenderer>();
         _objectlist = new List<e_Object>();
         _walkable = new Dictionary<e_Player, bool>();
         _visible = new Dictionary<e_Player, bool>();
         _heuristics = new Dictionary<e_Player, float>();
+        _movementCost = new Dictionary<e_Player, float>();
+        _alphas = new Dictionary<e_Player, float>();
         _potentialActions = new Dictionary<e_Player, List<ActionManager.e_Action>>();
         foreach (e_Player id in System.Enum.GetValues(typeof(e_Player)))
         {
             _walkable[id] = true;
             _visible[id] = false;
             _potentialActions[id] = new List<ActionManager.e_Action>();
-            _heuristics[id] = 0;
+            _alphas[id] = 0f;
+            _heuristics[id] = 0f;
+            _movementCost[id] = 100f;
         }
         _posX = (int)transform.position.x;
         _posY = (int)transform.position.y;
         _lightBlock = 0f;
-        _alpha = 0f;
-	}
+    }
 
     #region Object
 
@@ -122,14 +126,25 @@ public class BlockController : MonoBehaviour
         return _heuristics[playerId];
     }
 
+    public float GetMovementCost(e_Player playerId)
+    {
+        return _movementCost[playerId];
+    }
+
+    public float GetAlpha(e_Player playerId)
+    {
+        return _alphas[playerId];
+    }
+
     #endregion
 
     #region Setter
 
-    public void SetHeuristics(e_Player playerId, float val)
+    public void SetHeuristic(e_Player playerId, float val)
     {
         _heuristics[playerId] = val;
     }
+
     public void SetHeuristicsAll(float val)
     {
         foreach (e_Player playerId in System.Enum.GetValues(typeof(e_Player)))
@@ -144,6 +159,24 @@ public class BlockController : MonoBehaviour
         foreach (e_Player playerId in System.Enum.GetValues(typeof(e_Player)))
             _heuristics[playerId] += val;
     }
+    public void SetMovementCost(e_Player playerId, float val)
+    {
+        _movementCost[playerId] = val;
+    }
+    public void SetMovementCostAll(float val)
+    {
+        foreach (e_Player playerId in System.Enum.GetValues(typeof(e_Player)))
+            _movementCost[playerId] = val;
+    }
+    public void AddMovementCost(e_Player playerId, float val)
+    {
+        _movementCost[playerId] += val;
+    }
+    public void AddMovementCostAll(float val)
+    {
+        foreach (e_Player playerId in System.Enum.GetValues(typeof(e_Player)))
+            _movementCost[playerId] += val;
+    }
 
     public void SetWalkable(e_Player playerId, bool walk)
     {
@@ -155,6 +188,36 @@ public class BlockController : MonoBehaviour
         _visible[playerId] = vis;
     }
 
+    private void changeAlpha(e_Player playerId)
+    {
+        if (playerId == e_Player.PLAYER)
+        {
+            if (_rend != null)
+            {
+                Color col = _rend.color;
+                col.a = _alphas[playerId];
+                _rend.color = col;
+            }
+            IObject[] objs = GetComponentsInChildren<IObject>();
+            foreach (IObject obj in objs)
+            {
+                obj.Alpha = _alphas[playerId];
+            }
+        }
+    }
+
+    public void SetAlpha(e_Player playerId, float val)
+    {
+        _alphas[playerId] = val;
+        changeAlpha(playerId);
+    }
+
+    public void AddAlpha(e_Player playerId, float val)
+    {
+        _alphas[playerId] += val;
+        changeAlpha(playerId);
+    }
+
     public void SetWalkableAll(bool walk)
     {
         foreach (e_Player val in System.Enum.GetValues(typeof(e_Player)))
@@ -163,12 +226,7 @@ public class BlockController : MonoBehaviour
     public void SetVisibleAll(bool vis)
     {
         foreach (e_Player val in System.Enum.GetValues(typeof(e_Player)))
-            _visible[val] =  vis;
-    }
-
-    public void SetHeuristic(e_Player playerId, float heur)
-    {
-        _heuristics[playerId] = heur;
+            _visible[val] = vis;
     }
 
     #endregion
@@ -177,32 +235,12 @@ public class BlockController : MonoBehaviour
 
     public void AddLightBlock(float block)
     {
-        _lightBlock =+ block;
+        _lightBlock = +block;
     }
 
     public float GetLightBlock()
     {
         return _lightBlock;
-    }
-
-    public float Alpha
-    {
-        get { return _alpha; }
-        set
-        {
-            _alpha = value;
-            if (_rend != null)
-            {
-                Color col = _rend.color;
-                col.a = _alpha;
-                _rend.color = col;
-            }
-            IObject[] objs = GetComponentsInChildren<IObject>();
-            foreach (IObject obj in objs)
-            {
-                obj.Alpha = _alpha;
-            }
-        }
     }
 
     #endregion

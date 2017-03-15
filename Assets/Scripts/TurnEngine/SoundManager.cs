@@ -28,6 +28,7 @@ public class SoundManager : MonoBehaviour
                     if (block.HasObject(e_Object.WALL))
                         distSound++;
                 }
+                //Debug.Log("range = " + range);
                 if (Mathf.Floor(distSound) <= range + ent.HearingRange)
                     ent.SoundHeard(from, source, distSound);
             }

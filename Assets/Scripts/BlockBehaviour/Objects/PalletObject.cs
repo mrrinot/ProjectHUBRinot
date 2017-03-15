@@ -24,7 +24,7 @@ public class PalletObject : IObject
     {
         _state = e_PalletState.DESTROYED;
         _bCtrl.SetWalkableAll(true);
-        _bCtrl.RemovePotentialActionAll(ActionManager.e_Action.DESTROY_PALLET);
+        _bCtrl.AddMovementCostAll(-100);
         OnBlockRemove();
         GameObject.Destroy(this.gameObject);
     }
@@ -39,6 +39,7 @@ public class PalletObject : IObject
         _bCtrl.RemovePotentialAction(e_Player.PLAYER, _potAct);
         _bCtrl.SetWalkableAll(false);
         _bCtrl.SetWalkable(e_Player.PLAYER, true);
+        _bCtrl.AddMovementCostAll(100);
     }
 
     protected override void OnBlockAdd()

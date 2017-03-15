@@ -5,6 +5,7 @@ public class TrapObject : IObject
 {
     private bool _isArmed = true;
     private ActionManager.e_Action _potAct = ActionManager.e_Action.DISARM_TRAP;
+    private SoundManager _soundManager;
     private Sprite _armedTrap;
     private Sprite _disarmedTrap;
 
@@ -14,6 +15,7 @@ public class TrapObject : IObject
         _bCtrl.OnObjectAdded += DetectPlayers;
         _armedTrap = Resources.Load("Trap", typeof(Sprite)) as Sprite;
         _disarmedTrap = Resources.Load("Trap_2", typeof(Sprite)) as Sprite;
+        _soundManager = GameObject.Find("TurnManager").GetComponent<SoundManager>();
     }
     public void ArmTrap()
     {
@@ -26,7 +28,7 @@ public class TrapObject : IObject
             _bCtrl.OnObjectAdded += DetectPlayers;
             _minAlpha = 0.95f;
             _bCtrl.AddPotentialAction(e_Player.PLAYER, _potAct);
-
+            _bCtrl.AddMovementCostAll(100);
         }
         else
         {
@@ -36,6 +38,7 @@ public class TrapObject : IObject
             _minAlpha = 0.5f;
             _bCtrl.OnObjectAdded -= DetectPlayers;
             _bCtrl.AddPotentialAction(e_Player.PLAYER, _potAct);
+            _bCtrl.AddMovementCostAll(-100);
         }
     }
 
@@ -44,7 +47,7 @@ public class TrapObject : IObject
         ControllableEntity ent = _bCtrl.GetComponentInChildren<ControllableEntity>();
         if (ent != null)
         {
-            // SOUND
+            _soundManager.ProduceSound(ent, _bCtrl, 6);
             ent.MP_Current = 0;
             ArmTrap();
         }
@@ -54,6 +57,7 @@ public class TrapObject : IObject
     {
         _bCtrl.AddPotentialAction(e_Player.PLAYER, _potAct);
         _bCtrl.AddPotentialAction(e_Player.TRAPPER, ActionManager.e_Action.PICKUP_TRAP);
+        _bCtrl.AddMovementCostAll(100);
         base.OnBlockAdd(); // MUST BE LAST DUE TO CALLBACK IN CONTROLLER
     }
 
@@ -61,6 +65,7 @@ public class TrapObject : IObject
     {
         _bCtrl.RemovePotentialAction(e_Player.PLAYER, _potAct);
         _bCtrl.RemovePotentialAction(e_Player.TRAPPER, ActionManager.e_Action.PICKUP_TRAP);
+        _bCtrl.AddMovementCostAll(-100);
         base.OnBlockRemove(); // MUST BE LAST DUE TO CALLBACK IN CONTROLLER
     }
 }
